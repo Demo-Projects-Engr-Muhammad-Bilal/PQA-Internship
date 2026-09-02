@@ -1,5 +1,5 @@
 import { db, Prisma } from "@repo/db";
-import { CreatePilotFormInput } from "@repo/types";
+import { CreatePilotFormInput, SubmitFormInput } from "@repo/types";
 
 export class PilotFormService {
   
@@ -13,7 +13,7 @@ export class PilotFormService {
         data: {
           ...formData,
           pilotId,
-          status: "SUBMITTED",
+          status: "DRAFT",
           craftsUsed: craftsUsed ? {
             create: craftsUsed
           } : undefined,
@@ -99,6 +99,49 @@ export class PilotFormService {
           craftsUsed: true
         }
       });
+    });
+  }
+
+  // 5. Submit Form — Pilot's final declaration with Master signatures
+  public static async submitForm(
+    formId: string,
+    pilotId: string,
+    payload: SubmitFormInput,
+    ip: string
+  ) {
+    // Verify ownership and eligible status
+    const existingForm = await db.pilotForm.findUnique({
+      where: { id: formId },
+    });
+
+    if (!existingForm || existingForm.pilotId !== pilotId) {
+      throw new Error("Form not found or access denied");
+    }
+
+    if (existingForm.status !== "DRAFT" && existingForm.status !== "REJECTED") {
+      throw new Error(
+        `Form cannot be submitted from its current status: ${existingForm.status}`
+      );
+    }
+
+    // Stamp all signature + submission fields
+    return db.pilotForm.update({
+      where: { id: formId },
+      data: {
+        isDeclared: true,
+        pilotSignedAt: new Date(),
+        pilotSignatureIp: ip,
+        isMasterSigned: true,
+        masterSignature: payload.masterSignature,
+        masterSignedAt: new Date(),
+        masterName: payload.masterName,
+        shipStampImage: payload.shipStampImage,
+        status: "SUBMITTED",
+      },
+      include: {
+        craftsUsed: true,
+        pilot: { select: { name: true, email: true } },
+      },
     });
   }
 

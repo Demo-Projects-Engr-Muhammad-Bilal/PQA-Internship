@@ -16,25 +16,42 @@ export class AdminFormService {
     });
   }
 
-  // 2. Update form status (Approve / Reject)
-  public static async updateFormStatus(formId: string, newStatus: FormStatus) {
+  // 2. Update form status (Approve / Reject) — stamps HM/DM fields on approval
+  public static async updateFormStatus(
+    formId: string,
+    newStatus: FormStatus,
+    adminUserId?: string,
+    rejectionReason?: string
+  ) {
     const existingForm = await db.pilotForm.findUnique({
-      where: { id: formId }
+      where: { id: formId },
     });
 
     if (!existingForm) {
       throw new Error("Form not found");
     }
 
-    
+    // Build dynamic update payload
+    const updateData: Parameters<typeof db.pilotForm.update>[0]["data"] = {
+      status: newStatus,
+    };
 
-    // Update strictly the status, leaving all pilot-submitted data untouched
+    if (newStatus === "APPROVED" && adminUserId) {
+      updateData.hmDmUserId    = adminUserId;
+      updateData.hmDmSignedAt  = new Date();
+    }
+
+    if (newStatus === "REJECTED") {
+      updateData.rejectionReason = rejectionReason ?? null;
+    }
+
+    // Update strictly the status + approval fields, leaving pilot data untouched
     return db.pilotForm.update({
       where: { id: formId },
-      data: { status: newStatus },
+      data: updateData,
       include: {
-        pilot: { select: { name: true, email: true } }
-      }
+        pilot: { select: { name: true, email: true } },
+      },
     });
   }
 

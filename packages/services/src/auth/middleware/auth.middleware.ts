@@ -16,7 +16,7 @@ export const requireAuth = (req: Request, _res: Response, next: NextFunction): v
 
   try {
     const decoded = AuthCrypto.verifyAccessToken(token);
-    req.user = decoded;
+    (req as any).user = decoded;
     next();
   } catch {
     next(new AuthError("INVALID_TOKEN", "Invalid or expired authorization token", 401));
@@ -26,12 +26,12 @@ export const requireAuth = (req: Request, _res: Response, next: NextFunction): v
 // Middleware: Role-Based Authorization Guard
 export const requireRole = (allowedRoles: Role[]) => {
   return (req: Request, _res: Response, next: NextFunction): void => {
-    if (!req.user) {
+    if (!(req as any).user) {
       next(new AuthError("UNAUTHORIZED", "Unauthorized", 401));
       return;
     }
 
-    if (!allowedRoles.includes(req.user.role)) {
+    if (!allowedRoles.includes((req as any).user.role)) {
       next(
         new AuthError(
           "FORBIDDEN",

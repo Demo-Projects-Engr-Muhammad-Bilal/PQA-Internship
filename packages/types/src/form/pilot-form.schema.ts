@@ -76,9 +76,7 @@ export const createPilotFormSchema = z
 
     additionalRemarks: z.string().optional().nullable(),
 
-    isDeclared: z.boolean().refine((val) => val === true, {
-      message: "You must confirm that the contents are correct to the best of your knowledge.",
-    }),
+    isDeclared: z.boolean().default(false).optional(),
 
     // Nested Relation
     craftsUsed: z.array(craftUsageSchema).optional(),
@@ -93,3 +91,15 @@ export const createPilotFormSchema = z
   });
 
 export type CreatePilotFormInput = z.infer<typeof createPilotFormSchema>;
+
+// Schema for the Pilot's final submission (declaration + master signatures)
+export const submitFormSchema = z
+  .object({
+    isDeclared: z.literal(true, "You must declare the form contents are correct."),
+    masterSignature: z.string().min(1, "Master signature is required"),
+    masterName: z.string().min(1, "Master name is required"),
+    shipStampImage: z.string().min(1, "Ship stamp image is required"),
+  })
+  .strict();
+
+export type SubmitFormInput = z.infer<typeof submitFormSchema>;

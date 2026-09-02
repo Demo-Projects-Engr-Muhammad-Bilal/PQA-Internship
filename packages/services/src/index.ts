@@ -5,3 +5,4 @@ export * from "./errors";
 export * from "./utils/api-response";
 export * from "./form/pilot-form.service";
 
+export * from "./form/admin-form.service";

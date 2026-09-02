@@ -24,13 +24,17 @@ model User {
   resetPasswordToken  String?
   resetPasswordExpire DateTime?
   refreshTokens       RefreshToken[]
-  
+
   // NAYA RELATION: Ek Pilot multiple forms fill kar sakta hai
-  pilotForms          PilotForm[]    
+  pilotForms          PilotForm[]
+
+  // Signature & Countersign fields
+  signatureImage      String?        @db.Text
+  countersignedForms  PilotForm[]    @relation("CountersignedForms")
 
   createdAt           DateTime       @default(now())
   updatedAt           DateTime       @updatedAt
-  
+
   @@map("users")
 }
 
@@ -139,13 +143,32 @@ model PilotForm {
   craftsUsed              CraftUsage[]  // 1-to-Many normalized relation
   additionalRemarks       String?       @db.Text
 
-  // ADD THIS NEW FIELD for the Master's / Pilot's signature declaration
-  isDeclared             Boolean       @default(false)
-  
+  // 9. Declaration & Pilot Signature
+  isDeclared              Boolean       @default(false)
+  pilotSignedAt           DateTime?
+  pilotSignatureIp        String?
+
+  // 10. Master Signature
+  isMasterSigned          Boolean       @default(false)
+  masterSignature         String?       @db.Text   // Base64 image or URL
+  masterSignedAt          DateTime?
+  masterName              String?
+  shipStampImage          String?       @db.Text   // Base64 image or URL
+
+  // 11. HM / DM Countersign
+  hmDmUserId              String?
+  hmDmUser                User?         @relation("CountersignedForms", fields: [hmDmUserId], references: [id])
+  hmDmSignature           String?       @db.Text
+  hmDmSignedAt            DateTime?
+
+  // 12. Rejection
+  rejectionReason         String?       @db.Text
+
   createdAt               DateTime      @default(now())
   updatedAt               DateTime      @updatedAt
 
   @@index([pilotId])
+  @@index([hmDmUserId])
   @@map("pilot_forms")
 }
 
