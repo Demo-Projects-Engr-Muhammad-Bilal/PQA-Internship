@@ -116,6 +116,15 @@ export class PilotAuthService {
     });
   }
 
+  // Update signature
+  public static async updateSignature(userId: string, signatureImage: string) {
+    return db.user.update({
+      where: { id: userId },
+      data: { signatureImage },
+      select: { id: true, name: true, email: true, signatureImage: true },
+    });
+  }
+
   // Token Generation Helper
   private static async generateAuthTokens(
     user: { id: string; email: string; name: string | null; role: "ADMIN" | "PILOT" },

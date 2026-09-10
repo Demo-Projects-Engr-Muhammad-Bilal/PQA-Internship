@@ -1,9 +1,9 @@
-﻿import type { Metadata } from "next";
+import type { Metadata } from "next";
 import { Inter, Geist, Raleway } from "next/font/google";
 import { Toaster } from "sonner";
 import { AuthProvider } from "@/contexts"; // Removed ThemeProvider and ModeToggle
 import "./globals.css";
-import { cn } from "@/lib/utils";
+import { cn } from "@repo/utils";
 
 const raleway = Raleway({subsets:['latin'],variable:'--font-sans'});
 
@@ -41,5 +41,6 @@ export default function RootLayout({
     </html>
   );
 }
+
 
 

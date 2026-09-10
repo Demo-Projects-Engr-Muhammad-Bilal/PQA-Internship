@@ -285,6 +285,7 @@ export class AdminAuthService {
         password: hashedPassword,
         role: "PILOT",
         isActive: true,
+        signatureImage: input.signatureImage ?? null,
       },
       select: {
         id: true,
@@ -292,6 +293,7 @@ export class AdminAuthService {
         email: true,
         role: true,
         isActive: true,
+        signatureImage: true,
         createdAt: true,
       },
     });

@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef, useState, useCallback } from "react";
-import { Button } from "@/components/ui/button";
+import { Button } from "@repo/ui/ui/button";
 import { Camera, X, CheckCircle2 } from "lucide-react";
 import Image from "next/image";
 

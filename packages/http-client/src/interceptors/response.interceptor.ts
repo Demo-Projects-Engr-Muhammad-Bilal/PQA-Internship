@@ -8,7 +8,7 @@ type QueuedRequest = {
 };
 
 /**
- * On a 401, calls the backend `/api/auth/refresh` endpoint once, retries the
+ * On a 401, calls the backend `/auth/refresh` endpoint once, retries the
  * original request with the new access token, and queues any other requests
  * that 401'd while the refresh was in flight so they don't each trigger their
  * own refresh call.
@@ -40,24 +40,17 @@ export const setupResponseInterceptor = (
         | undefined;
 
       const isUnauthorized = error.response?.status === 401;
-      const isRefreshCall = originalRequest?.url?.includes("/api/auth/refresh");
+      const isRefreshCall = originalRequest?.url?.includes("/auth/refresh");
+      const isLoginCall = originalRequest?.url?.includes("/auth/login");
 
-      if (!isUnauthorized || !originalRequest || originalRequest._retry || isRefreshCall) {
-        throw error;
-      }
-
-      const refreshToken = tokenStorage.getRefreshToken();
-      if (!refreshToken) {
-        tokenStorage.clearTokens();
-        onSessionExpired?.();
+      if (!isUnauthorized || !originalRequest || originalRequest._retry || isRefreshCall || isLoginCall) {
         throw error;
       }
 
       if (isRefreshing) {
-        return new Promise<string>((resolve, reject) => {
-          pendingQueue.push({ resolve, reject });
-        }).then((newToken) => {
-          originalRequest.headers.set("Authorization", `Bearer ${newToken}`);
+        return new Promise<void>((resolve, reject) => {
+          pendingQueue.push({ resolve: resolve as unknown as (token: string) => void, reject });
+        }).then(() => {
           return instance(originalRequest);
         });
       }
@@ -66,19 +59,19 @@ export const setupResponseInterceptor = (
       isRefreshing = true;
 
       try {
-        const { data } = await instance.post<RefreshTokenApiResponse>("/api/auth/refresh", {
-          refreshToken,
-        });
+        // With HttpOnly cookies, the browser sends the refresh token automatically.
+        // No body needed — the server reads the cookie.
+        const { data } = await instance.post<RefreshTokenApiResponse>("/auth/refresh");
 
         const tokens = data.data;
         if (!tokens?.accessToken) {
           throw error;
         }
 
+        // setTokens is a no-op (server already set the new HttpOnly cookies in the response)
         tokenStorage.setTokens(tokens.accessToken, tokens.refreshToken);
         flushQueue(null, tokens.accessToken);
 
-        originalRequest.headers.set("Authorization", `Bearer ${tokens.accessToken}`);
         return instance(originalRequest);
       } catch (refreshError) {
         flushQueue(refreshError, null);

@@ -3,7 +3,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import type { AxiosInstance } from "axios";
 import * as React from "react";
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { Eye, EyeOff } from "lucide-react";
@@ -23,10 +23,10 @@ import {
   FormField,
   FormItem,
   FormLabel,
-  FormMessage, Input
-} from "@/components/ui";
+  FormMessage, Input, Label
+} from "@repo/ui";
 import type { Pilot } from "./pilot.types";
-
+import { SignaturePad, type SignaturePadHandle } from "@repo/ui";
 interface CreatePilotDialogProps {
   apiClient: AxiosInstance;
   onPilotCreated: (pilot: Pilot) => void;
@@ -46,10 +46,12 @@ export function CreatePilotDialog({ apiClient, onPilotCreated }: CreatePilotDial
   });
 
   const isSubmitting = form.formState.isSubmitting;
+  const sigPadRef = useRef<SignaturePadHandle>(null);
 
   const onSubmit = async (data: CreatePilotInput) => {
     try {
-      const response = await apiClient.post<ApiResponse<Pilot>>("/api/auth/pilots", data);
+      const signatureImage = sigPadRef.current?.getDataURL() || undefined;
+      const response = await apiClient.post<ApiResponse<Pilot>>("/auth/pilots", { ...data, signatureImage });
 
       if (response.data.success && response.data.data) {
         toast.success(`Pilot account for ${data.email} created successfully.`);
@@ -136,19 +138,28 @@ export function CreatePilotDialog({ apiClient, onPilotCreated }: CreatePilotDial
                         disabled={isSubmitting}
                         {...field}
                       />
-                      <button
+                      <Button
                         type="button"
+                        variant="ghost"
+                        size="icon"
                         onClick={() => setShowPassword(!showPassword)}
-                        className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground focus:outline-none"
+                        className="absolute right-1 top-1/2 -translate-y-1/2 h-8 w-8 text-muted-foreground hover:text-foreground"
                       >
                         {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                      </button>
+                      </Button>
                     </div>
                   </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
+
+            <div className="space-y-2">
+              <Label className="text-xs font-bold uppercase tracking-wider text-primary">
+                Pilot Signature (optional — can be added later from the pilot's profile)
+              </Label>
+              <SignaturePad ref={sigPadRef} label="Draw the pilot's signature" />
+            </div>
 
             <DialogFooter className="pt-4 sm:space-x-4">
               <Button

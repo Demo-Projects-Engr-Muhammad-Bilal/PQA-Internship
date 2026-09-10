@@ -9,7 +9,7 @@ import {
   Label, RadioGroup, RadioGroupItem, Select, SelectContent, SelectItem,
   SelectTrigger, SelectValue, Table, TableBody, TableCell, TableHead,
   TableHeader, TableRow, Textarea
-} from "@/components/ui";
+} from "@repo/ui";
 
 interface DgQuestionProps {
   name: "abnormalTempRiseDG" | "leakageLiquidDG" | "stowagePlanDGAttached";

@@ -5,7 +5,7 @@ import { CreatePilotFormInput } from "@repo/types";
 import {
   FormField, FormItem, FormLabel, FormControl, FormMessage,
   Input, Card, CardContent, Checkbox,
-} from "@/components/ui";
+} from "@repo/ui";
 import { toDatetimeLocalValue } from "../date-utils";
 
 export default function Step2Berthing() {

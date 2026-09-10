@@ -1,16 +1,17 @@
-// apps/admin/src/app/dashboard/forms/[id]/page.tsx
 "use client";
+import { useAuth } from "@repo/ui";
 
-import { FormCheckbox } from "@/components/form/FormCheckbox";
-import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Button } from "@/components/ui/button";
-import { Skeleton } from "@/components/ui/skeleton";
-import { useAuth, useDashboardData } from "@/contexts";
+import { FormCheckbox } from "@repo/ui";
+import { AdminRemarksPanel } from "@/components/admin/remarks-panel";
+import { Alert, AlertDescription } from "@repo/ui/ui/alert";
+import { Button } from "@repo/ui/ui/button";
+import { Skeleton } from "@repo/ui/ui/skeleton";
+import {  useDashboardData } from "@/contexts";
 import { AlertTriangle, ArrowLeft, Printer, CheckCircle, XCircle } from "lucide-react";
 import Link from "next/link";
 import { use, useEffect, useState } from "react";
 import { toast } from "sonner";
-import type { PilotFormRecord, FormApiResponse } from "@/types/form";
+import type { PilotFormWithRelations, ApiResponse } from "@repo/types";
 
 /* ============================================================
    ADMIN-SPECIFIC STATE
@@ -22,7 +23,7 @@ type ActionState = "idle" | "approving" | "rejecting";
    STATUS BADGE HELPERS
    ============================================================ */
 
-const STATUS_STYLES: Record<PilotFormRecord["status"], string> = {
+const STATUS_STYLES: Record<PilotFormWithRelations["status"], string> = {
   DRAFT: "bg-gray-200 text-gray-700",
   SUBMITTED: "bg-amber-100 text-amber-800",
   APPROVED: "bg-emerald-100 text-emerald-800",
@@ -43,7 +44,7 @@ export default function AdminFormReviewPage({
   const { apiClient } = useAuth();
   const { invalidateAllForms } = useDashboardData();
 
-  const [formData, setFormData] = useState<PilotFormRecord | null>(null);
+  const [formData, setFormData] = useState<PilotFormWithRelations | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [actionState, setActionState] = useState<ActionState>("idle");
@@ -56,8 +57,8 @@ export default function AdminFormReviewPage({
         setIsLoading(true);
         setError(null);
 
-        const response = await apiClient.get<FormApiResponse>(
-          `/api/forms/${formId}`
+        const response = await apiClient.get<ApiResponse<PilotFormWithRelations>>(
+          `/forms/${formId}`
         );
 
         if (response.data.success && response.data.data) {
@@ -81,7 +82,7 @@ export default function AdminFormReviewPage({
     if (!formData) return;
     setActionState("approving");
     try {
-      const response = await apiClient.patch(`/api/forms/${formId}/status`, {
+      const response = await apiClient.patch(`/forms/${formId}/status`, {
         status: "APPROVED",
       });
       if (response.data.success) {
@@ -108,7 +109,7 @@ export default function AdminFormReviewPage({
     }
     setActionState("rejecting");
     try {
-      const response = await apiClient.patch(`/api/forms/${formId}/status`, {
+      const response = await apiClient.patch(`/forms/${formId}/status`, {
         status: "REJECTED",
         rejectionReason: rejectionReason.trim(),
       });
@@ -279,6 +280,10 @@ export default function AdminFormReviewPage({
           )}
         </div>
 
+        <div className="no-print mb-8">
+          <AdminRemarksPanel formId={formId} />
+        </div>
+
         {/* =====================================================
             FORM CONTAINER â€” the ONLY element visible when printing.
             The .print-only-form + .form-page classes are the
@@ -364,8 +369,8 @@ function Label({ children }: { children: React.ReactNode }) {
      carries a non-white background or non-black foreground.
    ============================================================ */
 
-function FormContent({ form }: { form: PilotFormRecord }) {
-  const parseDateTime = (dateTimeStr?: string | null) => {
+function FormContent({ form }: { form: PilotFormWithRelations }) {
+  const parseDateTime = (dateTimeStr: string | Date | null | undefined) => {
     if (!dateTimeStr) return { date: "", time: "" };
     try {
       const date = new Date(dateTimeStr);
@@ -427,7 +432,7 @@ function FormContent({ form }: { form: PilotFormRecord }) {
   return (
     <div className="text-black">
       {/* ======================= HEADER ======================= */}
-      <div className="border-x border-t border-black">
+      <div className="form-section border-x border-t border-black">
         <div className="flex items-start justify-between px-2 pt-2 pb-1 gap-2">
           {/* Left: Actual logo image â€” no CSS-drawn box */}
           <div className="w-[92px] h-[64px] flex-shrink-0 flex items-start justify-start">
@@ -501,7 +506,7 @@ function FormContent({ form }: { form: PilotFormRecord }) {
       </div>
 
       {/* ============ ROW 2: VESSEL TYPE / REGISTRATION (thick bottom) ============ */}
-      <div className="grid grid-cols-2 gap-0 border-x border-black">
+      <div className="form-section grid grid-cols-2 gap-0 border-x border-black">
         {/* LEFT: Vessel Type + Name */}
         <div className="border-r border-black">
           <div
@@ -556,7 +561,7 @@ function FormContent({ form }: { form: PilotFormRecord }) {
       <div className="border-x border-black border-b-[3px] border-black" />
 
       {/* ============ ROW 3: PILOT OPS + BERTH/MOORED ============ */}
-      <div className="grid grid-cols-2 gap-0 border-x border-black border-b border-black">
+      <div className="form-section grid grid-cols-2 gap-0 border-x border-black border-b border-black">
         {/* LEFT: Pilot Boarding / Disembarkation */}
         <div className="grid grid-cols-2 gap-0 border-r border-black">
           <div className="border-r border-black px-2 py-1">
@@ -617,7 +622,7 @@ function FormContent({ form }: { form: PilotFormRecord }) {
       </div>
 
       {/* ============ ROW 4: EXTRA PILOTAGE / CRAFTS HEADER ============ */}
-      <div className="grid grid-cols-2 gap-0 border-x border-black">
+      <div className="form-section grid grid-cols-2 gap-0 border-x border-black">
         <div className="border-r border-black px-2 py-1">
           <div className="flex items-center gap-3 mb-1">
             <div className="text-[10px] font-bold">Extra Pilotage</div>
@@ -643,7 +648,7 @@ function FormContent({ form }: { form: PilotFormRecord }) {
       <div className="border-x border-black border-b-[3px] border-black" />
 
       {/* ============ ROW 5: CARGO (left) / CRAFTS TABLE (right) ============ */}
-      <div className="grid grid-cols-2 gap-0 border-x border-black">
+      <div className="form-section grid grid-cols-2 gap-0 border-x border-black">
         {/* LEFT SECTION: Cargo & Measurements */}
         <div className="border-r border-black">
           <div className="grid grid-cols-2 gap-0 border-b border-black">
@@ -657,7 +662,7 @@ function FormContent({ form }: { form: PilotFormRecord }) {
             </div>
           </div>
 
-          <div className="grid grid-cols-3 gap-0 border-b border-black">
+          <div className="form-section grid grid-cols-3 gap-0 border-b border-black">
             <div className="border-r border-black px-2 py-1">
               <Label>GT:</Label>
               <DataField value={form.gt} />
@@ -765,7 +770,7 @@ function FormContent({ form }: { form: PilotFormRecord }) {
 
         {/* RIGHT SECTION: Crafts Used Table â€” exactly 10 rows */}
         <div>
-          <div className="grid grid-cols-3 gap-0 border-b border-black">
+          <div className="form-section grid grid-cols-3 gap-0 border-b border-black">
             <div className="border-r border-black px-2 py-1 text-center font-bold text-[10px]">
               Name
             </div>
@@ -782,7 +787,7 @@ function FormContent({ form }: { form: PilotFormRecord }) {
             return (
               <div
                 key={idx}
-                className="grid grid-cols-3 gap-0 border-b border-black"
+                className="form-section grid grid-cols-3 gap-0 border-b border-black"
               >
                 <div className="border-r border-black px-2 py-1 text-[10px] font-bold">
                   {craftData?.craftName || craftName}
@@ -810,7 +815,7 @@ function FormContent({ form }: { form: PilotFormRecord }) {
       </div>
 
       {/* ============ ROW 6: DECLARATIONS & SIGNATURES ============ */}
-      <div className="grid grid-cols-2 gap-0 border border-black min-h-[220px]">
+      <div className="form-section grid grid-cols-2 gap-0 border border-black min-h-[220px]">
         {/* LEFT: Master Declaration */}
         <div className="border-r border-black flex flex-col">
           <div className="p-2 pb-6">
@@ -832,7 +837,7 @@ function FormContent({ form }: { form: PilotFormRecord }) {
             </div>
           </div>
 
-          <div className="flex-1 flex flex-col border-t border-black pt-2 px-2 pb-2 min-h-[80px]">
+          <div className="signature-block flex-1 flex flex-col border-t border-black pt-2 px-2 pb-2 min-h-[80px]">
             <div className="text-[10px] font-bold text-black mb-1">
               Master&apos;s Signature
             </div>
@@ -892,7 +897,7 @@ function FormContent({ form }: { form: PilotFormRecord }) {
               />
             </div>
 
-            <div className="flex-1 border-t border-black pt-2 min-h-[50px] flex flex-col">
+            <div className="signature-block flex-1 border-t border-black pt-2 min-h-[50px] flex flex-col">
               <div className="text-[10px] font-bold text-black">
                 Pilot&apos;s Signature
               </div>
@@ -908,7 +913,7 @@ function FormContent({ form }: { form: PilotFormRecord }) {
               </div>
             </div>
 
-            <div className="flex-1 flex items-end relative min-h-[40px]">
+            <div className="signature-block flex-1 flex items-end relative min-h-[40px]">
               <div className="absolute top-1 right-1 text-center">
                 <span className="text-[9px] font-bold block mb-1">
                   Countersigned by HM / DM

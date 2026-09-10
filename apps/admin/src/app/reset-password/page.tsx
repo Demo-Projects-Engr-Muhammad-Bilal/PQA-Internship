@@ -3,7 +3,7 @@
 import { useState, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
-import { AuthCard, ResetPasswordForm } from "@/components/shared";
+import { AuthCard, ResetPasswordForm } from "@repo/ui";
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_ADMIN_API_URL || "http://localhost:5001";
 
@@ -25,7 +25,7 @@ function ResetPasswordContent() {
     setIsLoading(true);
 
     try {
-      const response = await fetch(`${API_BASE_URL}/api/auth/reset-password`, {
+      const response = await fetch(`${API_BASE_URL}/auth/reset-password`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ token, newPassword: password }),

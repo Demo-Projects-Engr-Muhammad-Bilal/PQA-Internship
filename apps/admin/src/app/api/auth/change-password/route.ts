@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { withAuth } from "@/lib/api-middleware";
+import { withAuth } from "@repo/services";
 import { AdminAuthService, buildApiResponse } from "@repo/services";
 import { changePasswordSchema } from "@repo/types";
 import type { JWTPayload } from "@repo/types";
@@ -17,3 +17,4 @@ export const POST = withAuth(
   },
   ["ADMIN"]
 );
+

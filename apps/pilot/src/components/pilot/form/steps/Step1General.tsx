@@ -5,8 +5,8 @@ import { CreatePilotFormInput } from "@repo/types";
 import {
   FormField, FormItem, FormLabel, FormControl, FormMessage,
   Input, Select, SelectTrigger, SelectValue, SelectContent, SelectItem,
-} from "@/components/ui";
-import { DateTimePicker } from "@/components/ui/date-time-picker";
+} from "@repo/ui";
+import { DateTimePicker } from "@repo/ui/ui/date-time-picker";
 import { toDatetimeLocalValue } from "../date-utils";
 
 export default function Step1General() {

@@ -23,7 +23,7 @@ import {
   FormItem,
   FormLabel,
   FormMessage, Input
-} from "@/components/ui";
+} from "@repo/ui";
 import type { Pilot } from "./pilot.types";
 
 interface ResetPilotPasswordDialogProps {
@@ -62,7 +62,7 @@ export function ResetPilotPasswordDialog({
   const onSubmit = async (values: AdminResetPilotPasswordInput) => {
     try {
       const response = await apiClient.post<ApiResponse<ResetPasswordResponse>>(
-        "/api/auth/pilots/reset-password",
+        "/auth/pilots/reset-password",
         values
       );
 

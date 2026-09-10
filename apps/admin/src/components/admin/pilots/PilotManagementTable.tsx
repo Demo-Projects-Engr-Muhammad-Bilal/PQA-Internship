@@ -12,7 +12,7 @@ import {
   TableHeader,
   TableRow,
   Button
-} from "@/components/ui";
+} from "@repo/ui";
 import { PilotRowActions } from "./PilotRowActions";
 import type { Pilot } from "./pilot.types";
 

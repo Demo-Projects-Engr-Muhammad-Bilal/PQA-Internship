@@ -1,18 +1,26 @@
-﻿"use client";
+"use client";
+import { useAuth } from "@repo/ui";
 
-import { AuthCard, LoginForm } from "@/components/shared";
-import { useAuth } from "@/contexts";
+import { useState } from "react";
+import { AuthCard, LoginForm } from "@repo/ui";
+import { } from "@/contexts";
+import { toast } from "sonner";
 
 export default function PilotLoginPage() {
-  const { login, isLoading, error, clearError } = useAuth();
+  const { login, clearError } = useAuth();
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleLogin = async (credentials: { email: string; password: string }) => {
-    clearError();
+    console.log("1. Form Submitted", credentials);
+    clearError?.();
+    setIsSubmitting(true);
     try {
       await login(credentials.email, credentials.password, "pilot");
       window.location.href = "/dashboard";
-    } catch {
-      // error state is already surfaced by the auth context
+    } catch (err: any) {
+      toast.error(err.response?.data?.message || err.message || "Invalid credentials or rate limit exceeded.");
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -27,8 +35,7 @@ export default function PilotLoginPage() {
           <LoginForm
             portalName="Pilot Operations"
             onSubmit={handleLogin}
-            isLoading={isLoading}
-            errorMessage={error}
+            isLoading={isSubmitting}
           />
         </AuthCard>
       </div>

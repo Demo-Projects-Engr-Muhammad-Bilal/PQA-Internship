@@ -1,7 +1,7 @@
 ﻿"use client";
 
 import Link from "next/link";
-import { Button } from "@/components/ui/button";
+import { Button } from "@repo/ui/ui/button";
 import PilotFormWizard from "@/components/pilot/form/PilotFormWizard";
 
 export default function NewFormPage() {

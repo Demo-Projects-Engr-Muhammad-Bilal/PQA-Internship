@@ -21,7 +21,7 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui";
+} from "@repo/ui";
 
 function getStatusVariant(status: string): "default" | "secondary" | "outline" {
   if (status === "APPROVED") return "default";

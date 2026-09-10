@@ -31,6 +31,8 @@ model User {
   // Signature & Countersign fields
   signatureImage      String?        @db.Text
   countersignedForms  PilotForm[]    @relation("CountersignedForms")
+  authoredRemarks     AdminRemark[]  @relation("RemarkAuthor")
+  auditLogs           AuditLog[]
 
   createdAt           DateTime       @default(now())
   updatedAt           DateTime       @updatedAt
@@ -147,6 +149,7 @@ model PilotForm {
   isDeclared              Boolean       @default(false)
   pilotSignedAt           DateTime?
   pilotSignatureIp        String?
+  pilotSignatureImage     String?       @db.Text   // Snapshot of the signature used at submission
 
   // 10. Master Signature
   isMasterSigned          Boolean       @default(false)
@@ -163,6 +166,7 @@ model PilotForm {
 
   // 12. Rejection
   rejectionReason         String?       @db.Text
+  adminRemarks            AdminRemark[]
 
   createdAt               DateTime      @default(now())
   updatedAt               DateTime      @updatedAt
@@ -188,4 +192,42 @@ model CraftUsage {
 
   @@index([formId])
   @@map("craft_usages")
+}
+
+model AdminRemark {
+  id         String   @id @default(cuid())
+  formId     String
+  form       PilotForm @relation(fields: [formId], references: [id], onDelete: Cascade)
+  authorId   String
+  author     User      @relation("RemarkAuthor", fields: [authorId], references: [id])
+  message    String    @db.Text
+  createdAt  DateTime  @default(now())
+
+  @@index([formId])
+  @@map("admin_remarks")
+}
+
+enum AuditAction {
+  LOGIN
+  FORM_SUBMITTED
+  FORM_APPROVED
+  FORM_REJECTED
+  PILOT_CREATED
+  SYSTEM_CONFIG_CHANGED
+}
+
+model AuditLog {
+  id         String      @id @default(cuid())
+  userId     String?
+  user       User?       @relation(fields: [userId], references: [id])
+  action     AuditAction
+  entityId   String?     // e.g., form ID
+  entityType String?     // e.g., "PilotForm"
+  metadata   Json?       // Before/After snapshots, IP address, etc.
+  createdAt  DateTime    @default(now())
+
+  @@index([userId])
+  @@index([action])
+  @@index([entityId])
+  @@map("audit_logs")
 }

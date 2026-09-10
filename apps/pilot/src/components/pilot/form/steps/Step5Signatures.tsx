@@ -1,15 +1,16 @@
 "use client";
+import { useAuth } from "@repo/ui";
 
 import { useRef, useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { Loader2, ShieldCheck } from "lucide-react";
-import { useAuth } from "@/contexts";
+import { } from "@/contexts";
 import {
   Button, Card, CardContent, CardHeader, CardTitle,
   Input, Label,
-} from "@/components/ui";
-import SignaturePad, { type SignaturePadHandle } from "../SignaturePad";
+} from "@repo/ui";
+import { SignaturePad, type SignaturePadHandle } from "@repo/ui";
 import StampCapture from "../StampCapture";
 
 interface Step5SignaturesProps {
@@ -26,11 +27,11 @@ const DRAFT_KEY = "pilot_form_draft";
  *
  * - Collects isDeclared checkbox, master name text input,
  *   master signature pad, and ship stamp capture.
- * - Calls POST /api/forms/[id]/submit.
+ * - Calls POST /forms/[id]/submit.
  * - Independent of react-hook-form (signatures are ref/state-based).
  */
 export default function Step5Signatures({ formId, onBack }: Step5SignaturesProps) {
-  const { apiClient } = useAuth();
+  const { apiClient, user } = useAuth();
   const router = useRouter();
 
   // Local controlled state for this step
@@ -39,19 +40,34 @@ export default function Step5Signatures({ formId, onBack }: Step5SignaturesProps
   const [shipStampImage, setShipStampImage] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // Ref to the signature pad — reads Base64 on submit
-  const sigPadRef = useRef<SignaturePadHandle>(null);
+  // Pilot signature: auto-populated, with manual override
+  const [useSavedSignature, setUseSavedSignature] = useState(Boolean(user?.signatureImage));
+  const pilotSigPadRef = useRef<SignaturePadHandle>(null);
 
-  // The submit button is only enabled when ALL four fields are satisfied
+  const resolvePilotSignature = useCallback((): string => {
+    if (useSavedSignature && user?.signatureImage) return user.signatureImage;
+    return pilotSigPadRef.current?.getDataURL() ?? "";
+  }, [useSavedSignature, user?.signatureImage]);
+
+  // Ref to the master signature pad
+  const masterSigPadRef = useRef<SignaturePadHandle>(null);
+
+  // The submit button is only enabled when all fields are satisfied
   const isReady =
     isDeclared &&
     masterName.trim().length > 0 &&
     shipStampImage.length > 0 &&
-    !(sigPadRef.current?.isEmpty() ?? true);
+    resolvePilotSignature().length > 0 &&
+    !(masterSigPadRef.current?.isEmpty() ?? true);
 
   const handleSubmit = useCallback(async () => {
-    const masterSignature = sigPadRef.current?.getDataURL() ?? "";
+    const pilotSignatureImage = resolvePilotSignature();
+    const masterSignature = masterSigPadRef.current?.getDataURL() ?? "";
 
+    if (!pilotSignatureImage) {
+      toast.error("Your signature is required — draw one or use your saved signature.");
+      return;
+    }
     if (!masterSignature) {
       toast.error("Please draw the master\u2019s signature before submitting.");
       return;
@@ -59,8 +75,9 @@ export default function Step5Signatures({ formId, onBack }: Step5SignaturesProps
 
     setIsSubmitting(true);
     try {
-      await apiClient.post(`/api/forms/${formId}/submit`, {
+      await apiClient.post(`/forms/${formId}/submit`, {
         isDeclared: true,
+        pilotSignatureImage,
         masterSignature,
         masterName: masterName.trim(),
         shipStampImage,
@@ -75,7 +92,7 @@ export default function Step5Signatures({ formId, onBack }: Step5SignaturesProps
     } finally {
       setIsSubmitting(false);
     }
-  }, [apiClient, formId, masterName, shipStampImage, router]);
+  }, [apiClient, formId, masterName, shipStampImage, router, resolvePilotSignature]);
 
   return (
     <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
@@ -114,6 +131,50 @@ export default function Step5Signatures({ formId, onBack }: Step5SignaturesProps
         </CardContent>
       </Card>
 
+      {/* Pilot Signature Block */}
+      {user?.signatureImage ? (
+        <Card className="border-primary/10 shadow-md">
+          <CardHeader className="bg-gray-50/50 border-b border-gray-100 pb-4">
+            <CardTitle className="text-sm font-bold tracking-widest text-accent uppercase">
+              Your Signature
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="pt-6 space-y-3">
+            {useSavedSignature ? (
+              <>
+                <div className="rounded-lg border-2 border-dashed border-primary/30 bg-gray-50 p-4">
+                  <img src={user.signatureImage} alt="Your saved signature" className="h-16 object-contain" />
+                </div>
+                <Button type="button" variant="ghost" size="sm" onClick={() => setUseSavedSignature(false)}>
+                  Not you? Draw a different signature
+                </Button>
+              </>
+            ) : (
+              <>
+                <SignaturePad ref={pilotSigPadRef} label="Draw your signature" />
+                <Button type="button" variant="ghost" size="sm" onClick={() => setUseSavedSignature(true)}>
+                  Use my saved signature instead
+                </Button>
+              </>
+            )}
+          </CardContent>
+        </Card>
+      ) : (
+        <Card className="border-primary/10 shadow-md">
+          <CardHeader className="bg-gray-50/50 border-b border-gray-100 pb-4">
+            <CardTitle className="text-sm font-bold tracking-widest text-accent uppercase">
+              Your Signature
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="pt-6 space-y-3">
+            <SignaturePad ref={pilotSigPadRef} label="Draw your signature" />
+            <p className="text-xs text-muted-foreground">
+              Tip: You can save your signature in your <a href="/dashboard/settings" className="text-accent hover:underline">profile settings</a> to auto-fill this in the future.
+            </p>
+          </CardContent>
+        </Card>
+      )}
+
       {/* Master Name */}
       <Card className="border-primary/10 shadow-md">
         <CardHeader className="bg-gray-50/50 border-b border-gray-100 pb-4">
@@ -148,7 +209,7 @@ export default function Step5Signatures({ formId, onBack }: Step5SignaturesProps
           </CardTitle>
         </CardHeader>
         <CardContent className="pt-6">
-          <SignaturePad ref={sigPadRef} label="Draw signature in the box below" />
+          <SignaturePad ref={masterSigPadRef} label="Draw signature in the box below" />
         </CardContent>
       </Card>
 

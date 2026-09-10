@@ -1,4 +1,5 @@
-import { db, Prisma } from "@repo/db";
+import { db } from "@repo/db";
+import { Prisma } from "@prisma/client";
 import { CreatePilotFormInput, SubmitFormInput } from "@repo/types";
 
 export class PilotFormService {
@@ -131,6 +132,7 @@ export class PilotFormService {
         isDeclared: true,
         pilotSignedAt: new Date(),
         pilotSignatureIp: ip,
+        pilotSignatureImage: payload.pilotSignatureImage, // NEW
         isMasterSigned: true,
         masterSignature: payload.masterSignature,
         masterSignedAt: new Date(),

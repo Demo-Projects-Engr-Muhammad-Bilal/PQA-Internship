@@ -1,8 +1,8 @@
 "use client";
 
 import { CheckIcon } from "lucide-react";
-import { cn } from "@/lib/utils";
-import { Separator } from "@/components/ui";
+import { cn } from "@repo/utils";
+import { Separator } from "@repo/ui";
 
 export interface StepDefinition {
   step: number;
@@ -76,3 +76,4 @@ export function StepIndicator({
     </div>
   );
 }
+

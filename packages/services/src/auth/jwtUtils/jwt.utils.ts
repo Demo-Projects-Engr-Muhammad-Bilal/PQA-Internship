@@ -3,9 +3,18 @@ import bcrypt from "bcryptjs";
 import crypto from "crypto";
 import { JWTPayload } from "@repo/types";
 
-const ACCESS_TOKEN_SECRET = process.env.JWT_ACCESS_SECRET || "default_access_secret_key_123";
-const REFRESH_TOKEN_SECRET = process.env.JWT_REFRESH_SECRET || "default_refresh_secret_key_456";
+function requireEnv(name: string): string {
+  const value = process.env[name];
+  if (!value || value.length < 32) {
+    throw new Error(
+      `${name} must be set to a strong secret (>=32 chars) in every environment. Refusing to boot with a weak/missing secret.`
+    );
+  }
+  return value;
+}
 
+const ACCESS_TOKEN_SECRET = requireEnv("JWT_ACCESS_SECRET");
+const REFRESH_TOKEN_SECRET = requireEnv("JWT_REFRESH_SECRET");
 export class AuthCrypto {
   // Password hashing
   static async hashPassword(password: string): Promise<string> {

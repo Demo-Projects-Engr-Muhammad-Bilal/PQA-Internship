@@ -5,7 +5,7 @@ import { CreatePilotFormInput } from "@repo/types";
 import {
   FormField, FormItem, FormLabel, FormControl, FormMessage,
   Input, Separator,
-} from "@/components/ui";
+} from "@repo/ui";
 
 type NumericFieldName =
   | "loa" | "beam" | "gt" | "nt" | "dwt" | "draftFwd" | "draftAft"

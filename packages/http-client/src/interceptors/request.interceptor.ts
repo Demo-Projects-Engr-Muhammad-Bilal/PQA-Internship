@@ -7,6 +7,7 @@ export const setupRequestInterceptor = (
   tokenStorage: TokenStorage
 ): void => {
   instance.interceptors.request.use((config) => {
+    console.log("3. HTTP Client executing request to:", config.baseURL, config.url);
     const token = tokenStorage.getAccessToken();
     if (token) {
       config.headers.set("Authorization", `Bearer ${token}`);

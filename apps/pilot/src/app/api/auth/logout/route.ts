@@ -1,22 +1,31 @@
 import { NextRequest, NextResponse } from "next/server";
-import { withAuth } from "@/lib/api-middleware";
+import { cookies } from "next/headers";
 import { LogoutService, buildApiResponse } from "@repo/services";
-import { refreshTokenSchema } from "@repo/types";
-import type { JWTPayload } from "@repo/types";
 
-export const POST = withAuth(
-  async (request: NextRequest, _user: JWTPayload) => {
-    try {
-      const body = await request.json();
-      const { refreshToken } = refreshTokenSchema.parse(body);
-      const result = await LogoutService.logout(refreshToken);
-      return NextResponse.json(
-        buildApiResponse(result, result.message),
-        { status: 200 }
-      );
-    } catch (error) {
-      throw error;
+export async function POST(_request: NextRequest) {
+  try {
+    const cookieStore = await cookies();
+    const refreshToken = cookieStore.get("pilot_refresh_token")?.value;
+
+    if (refreshToken) {
+      await LogoutService.logout(refreshToken);
     }
-  },
-  ["PILOT"]
-);
+
+    cookieStore.delete("pilot_access_token");
+    cookieStore.delete("pilot_refresh_token");
+
+    return NextResponse.json(
+      buildApiResponse(null, "Logged out successfully"),
+      { status: 200 }
+    );
+  } catch {
+    // Even if the server-side logout fails, clear the cookies to end the session
+    const cookieStore = await cookies();
+    cookieStore.delete("pilot_access_token");
+    cookieStore.delete("pilot_refresh_token");
+    return NextResponse.json(
+      buildApiResponse(null, "Logged out"),
+      { status: 200 }
+    );
+  }
+}

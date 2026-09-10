@@ -1,5 +1,6 @@
 "use client";
 
+import { AuthContext, type AuthContextType, type Portal } from "@repo/ui";
 import {
   createContext,
   useCallback,
@@ -12,23 +13,16 @@ import axios, { type AxiosInstance } from "axios";
 import type { JWTPayload, Role } from "@repo/types";
 import { createHttpClient, type HttpClient } from "@repo/http-client";
 
-export type Portal = "admin" | "pilot";
 
-export interface AuthContextType {
-  user: JWTPayload | null;
-  isAuthenticated: boolean;
-  isLoading: boolean;
-  error: string | null;
-  /** Axios instance scoped to this portal — carries the bearer token and auto-refreshes on 401. Use this for all authenticated API calls instead of a bare `axios` import. */
-  apiClient: AxiosInstance;
 
-  login: (email: string, password: string, portal: Portal) => Promise<void>;
-  logout: () => Promise<void>;
-  refreshToken: () => Promise<void>;
-  clearError: () => void;
+export interface AuthUser extends JWTPayload {
+  name?: string | null;
+  signatureImage?: string | null;
 }
 
-export const AuthContext = createContext<AuthContextType | null>(null);
+
+
+
 
 export interface AuthProviderProps {
   children: ReactNode;
@@ -83,7 +77,7 @@ export function AuthProvider({
   portal,
   loginRedirectPath = "/",
 }: AuthProviderProps) {
-  const [user, setUser] = useState<JWTPayload | null>(null);
+  const [user, setUser] = useState<AuthUser | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -92,18 +86,38 @@ export function AuthProvider({
       createHttpClient({ baseURL: apiBaseUrl, storagePrefix: portal }, () => {
         setUser(null);
         if (typeof window !== "undefined") {
-          // eslint-disable-next-line react-hooks/immutability`n          window.location.href = loginRedirectPath;
+          window.location.href = loginRedirectPath;
         }
       }),
     [apiBaseUrl, portal, loginRedirectPath]
   );
 
+  const refreshUser = useCallback(async () => {
+    try {
+      const { data } = await client.instance.get("/auth/me");
+      if (data.success && data.data) {
+        setUser((prev) => ({
+          ...(prev || decodeJwtPayload(client.tokenStorage.getAccessToken() || "") || {} as JWTPayload),
+          ...data.data,
+          userId: data.data.id || prev?.userId, // Map DB 'id' to JWT 'userId' if needed
+        }));
+      }
+    } catch {
+      // Ignore
+    }
+  }, [client]);
+
   // Hydrate user state from a token already in storage (page refresh, new tab, etc).
   useEffect(() => {
     const existingToken = client.tokenStorage.getAccessToken();
-    // eslint-disable-next-line react-hooks/set-state-in-effect`n    setUser(existingToken ? decodeJwtPayload(existingToken) : null);
-    setIsLoading(false);
-  }, [client]);
+    if (existingToken) {
+      setUser(decodeJwtPayload(existingToken));
+      refreshUser().finally(() => setIsLoading(false));
+    } else {
+      setUser(null);
+      setIsLoading(false);
+    }
+  }, [client, refreshUser]);
 
   const clearError = useCallback(() => setError(null), []);
 
@@ -117,8 +131,9 @@ export function AuthProvider({
 
       setError(null);
       setIsLoading(true);
+      console.log("2. Auth Context Called", { email, loginPortal });
       try {
-        const { data } = await client.instance.post("/api/auth/login", {
+        const { data } = await client.instance.post("/auth/login", {
           email,
           password,
         });
@@ -145,7 +160,7 @@ export function AuthProvider({
     try {
       const storedRefreshToken = client.tokenStorage.getRefreshToken();
       if (storedRefreshToken) {
-        await client.instance.post("/api/auth/logout", {
+        await client.instance.post("/auth/logout", {
           refreshToken: storedRefreshToken,
         });
       }
@@ -157,7 +172,7 @@ export function AuthProvider({
       setUser(null);
       setIsLoading(false);
       if (typeof window !== "undefined") {
-        // eslint-disable-next-line react-hooks/immutability`n          window.location.href = loginRedirectPath;
+        window.location.href = loginRedirectPath;
       }
     }
   }, [client, loginRedirectPath]);
@@ -167,7 +182,7 @@ export function AuthProvider({
     if (!storedRefreshToken) {
       throw new Error("No refresh token available");
     }
-    const { data } = await client.instance.post("/api/auth/refresh", {
+    const { data } = await client.instance.post("/auth/refresh", {
       refreshToken: storedRefreshToken,
     });
     const tokens = data.data as RefreshResponseData;
@@ -185,9 +200,10 @@ export function AuthProvider({
       login,
       logout,
       refreshToken,
+      refreshUser,
       clearError,
     }),
-    [user, isLoading, error, client, login, logout, refreshToken, clearError]
+    [user, isLoading, error, client, login, logout, refreshToken, refreshUser, clearError]
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

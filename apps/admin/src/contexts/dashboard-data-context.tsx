@@ -7,7 +7,7 @@ import {
   useReducer,
   type ReactNode,
 } from "react";
-import { useAuth } from "./use-auth";
+import { useAuth } from "@repo/ui";
 
 export interface AdminFormResponse {
   id: string;
@@ -95,7 +95,7 @@ export function DashboardDataProvider({ children }: { children: ReactNode }) {
   const fetchAllForms = useCallback(async () => {
     dispatch({ type: "FETCH_START", key: "allForms" });
     try {
-      const response = await apiClient.get("/api/forms");
+      const response = await apiClient.get("/forms");
       const data: AdminFormResponse[] = response.data.success ? response.data.data : [];
       dispatch({ type: "FETCH_SUCCESS", key: "allForms", data });
     } catch (err) {
@@ -110,7 +110,7 @@ export function DashboardDataProvider({ children }: { children: ReactNode }) {
   const fetchPilots = useCallback(async () => {
     dispatch({ type: "FETCH_START", key: "pilots" });
     try {
-      const response = await apiClient.get("/api/auth/pilots");
+      const response = await apiClient.get("/auth/pilots");
       const data: PilotAccount[] = response.data.success ? response.data.data : [];
       dispatch({ type: "FETCH_SUCCESS", key: "pilots", data });
     } catch (err) {

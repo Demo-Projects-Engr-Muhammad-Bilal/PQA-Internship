@@ -14,7 +14,7 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger
-} from "@/components/ui";
+} from "@repo/ui";
 import { ResetPilotPasswordDialog } from "./ResetPilotPasswordDialog";
 import type { Pilot } from "./pilot.types";
 
@@ -42,7 +42,7 @@ export function PilotRowActions({ pilot, apiClient, onStatusToggled }: PilotRowA
 
     try {
       const response = await apiClient.patch<ApiResponse<ToggleStatusResponse>>(
-        "/api/auth/pilots/status",
+        "/auth/pilots/status",
         { pilotId: pilot.id, isActive: newStatus }
       );
 

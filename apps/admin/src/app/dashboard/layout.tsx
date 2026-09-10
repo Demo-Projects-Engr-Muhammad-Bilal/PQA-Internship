@@ -1,4 +1,5 @@
 "use client";
+import { useAuth } from "@repo/ui";
 
 import React, { useState } from "react";
 import Link from "next/link";
@@ -15,20 +16,20 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
   SidebarRail,
-} from "@/components/ui/sidebar";
-import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
+} from "@repo/ui/ui/sidebar";
+import { SidebarProvider, SidebarTrigger } from "@repo/ui/ui/sidebar";
 import {
   Sheet,
   SheetContent,
   SheetTrigger,
-} from "@/components/ui/sheet";
+} from "@repo/ui/ui/sheet";
 import {
   Breadcrumb,
   BreadcrumbItem,
   BreadcrumbLink,
   BreadcrumbList,
   BreadcrumbSeparator,
-} from "@/components/ui/breadcrumb";
+} from "@repo/ui/ui/breadcrumb";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -36,11 +37,11 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Button } from "@/components/ui/button";
-import { useAuth, DashboardDataProvider } from "@/contexts";
-import { ModeToggle } from "@/components/shared/mode-toggle";
+} from "@repo/ui/ui/dropdown-menu";
+import { Avatar, AvatarFallback, AvatarImage } from "@repo/ui/ui/avatar";
+import { Button } from "@repo/ui/ui/button";
+import {  DashboardDataProvider } from "@/contexts";
+import { ModeToggle } from "@repo/ui/shared/mode-toggle";
 
 const NAV_ITEMS = [
   { href: "/dashboard", label: "Forms", icon: FileText },
@@ -199,7 +200,8 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                     width={200} 
                     height={60} 
                     className="w-auto h-12 object-contain group-data-[collapsible=icon]:hidden" 
-                  />
+                  priority
+                    />
                   {/* Collapsed Logo */}
                   <Image 
                     src="/collapse-logo.png" 

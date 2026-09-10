@@ -1,19 +1,26 @@
 "use client";
+import { useAuth } from "@repo/ui";
 
+import { useState } from "react";
 import Link from "next/link";
-import { AuthCard, LoginForm } from "@/components/shared";
-import { useAuth } from "@/contexts";
+import { AuthCard, LoginForm } from "@repo/ui";
+import { } from "@/contexts";
+import { toast } from "sonner";
 
 export default function AdminLoginPage() {
-  const { login, isLoading, error, clearError } = useAuth();
+  const { login, clearError } = useAuth();
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleLogin = async (credentials: { email: string; password: string }) => {
-    clearError();
+    clearError?.();
+    setIsSubmitting(true);
     try {
       await login(credentials.email, credentials.password, "admin");
       window.location.href = "/dashboard";
-    } catch {
-      // error state is already surfaced by the auth context
+    } catch (err: any) {
+      toast.error(err.response?.data?.message || err.message || "Invalid credentials or rate limit exceeded.");
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -28,8 +35,7 @@ export default function AdminLoginPage() {
           <LoginForm
             portalName="Admin Console"
             onSubmit={handleLogin}
-            isLoading={isLoading}
-            errorMessage={error}
+            isLoading={isSubmitting}
           />
 
           {/* Navigation Links */}

@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@source "../../../packages/ui/src";
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
 
@@ -169,7 +170,7 @@ body {
 @media print {
   @page {
     size: A4;
-    margin: 0;
+    margin: 12mm 8mm; /* real page margins now come from @page, not from .form-page padding */
   }
 
   html,
@@ -186,46 +187,51 @@ body {
     print-color-adjust: exact !important;
   }
 
-  /* Hide everything by default... */
   body * {
     visibility: hidden;
   }
 
-  /* ...then reveal only the form container and all its descendants. */
   .print-only-form,
   .print-only-form * {
     visibility: visible;
   }
 
-  /* Explicitly hide the admin chrome that must never print. */
   .no-print,
   .no-print * {
     display: none !important;
     visibility: hidden !important;
   }
 
-  /* Snap the form to the top-left corner of the printed page. */
   .print-only-form {
-    position: absolute;
-    top: 0;
-    left: 0;
+    position: static; /* was absolute — static lets the document flow across multiple pages */
     margin: 0 !important;
     box-shadow: none !important;
     border: none !important;
   }
 
-  /* Exact A4 sizing — identical to pilot app. */
   .form-page {
-    width: 210mm;
-    height: 297mm;
-    max-height: 297mm;
-    padding: 8mm;
+    width: 100%;
+    height: auto;        /* was 297mm — content now determines page count */
+    max-height: none;    /* was 297mm */
+    padding: 0;           /* margin now comes from @page */
     box-sizing: border-box;
-    overflow: hidden;
+    overflow: visible;    /* was hidden — the actual bug fix */
     box-shadow: none !important;
     border: none !important;
-    page-break-after: avoid !important;
-    page-break-inside: avoid !important;
+  }
+
+  /* Keep atomic sections intact instead of splitting mid-block across a page boundary */
+  .form-section,
+  .signature-block,
+  table tr {
+    page-break-inside: avoid;
+    break-inside: avoid;
+  }
+
+  /* If a section is pushed to page 2+, don't leave an orphaned heading on the prior page */
+  h2, h3, .section-title {
+    page-break-after: avoid;
+    break-after: avoid;
   }
 }
 

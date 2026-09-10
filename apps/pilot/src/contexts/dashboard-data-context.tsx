@@ -7,7 +7,7 @@ import {
   useReducer,
   type ReactNode,
 } from "react";
-import { useAuth } from "./use-auth";
+import { useAuth } from "@repo/ui";
 
 export interface PilotFormResponse {
   id: string;
@@ -99,7 +99,7 @@ export function DashboardDataProvider({ children }: { children: ReactNode }) {
   const fetchMyForms = useCallback(async () => {
     dispatch({ type: "FETCH_START", key: "myForms" });
     try {
-      const response = await apiClient.get("/api/forms");
+      const response = await apiClient.get("/forms");
       const data: PilotFormResponse[] = response.data.success ? response.data.data : [];
       dispatch({ type: "FETCH_SUCCESS", key: "myForms", data });
     } catch (err) {

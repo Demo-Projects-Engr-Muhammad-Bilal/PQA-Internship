@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { withAuth } from "@/lib/api-middleware";
+import { withAuth } from "@repo/services";
 import { AdminFormService, buildApiResponse } from "@repo/services";
 import type { JWTPayload } from "@repo/types";
 

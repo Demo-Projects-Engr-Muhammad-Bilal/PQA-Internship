@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { handleApiError } from "@/lib/api-middleware";
+import { handleApiError } from "@repo/services";
 import { AdminAuthService, buildApiResponse, AuthError } from "@repo/services";
 
 export async function POST(request: NextRequest) {
@@ -21,3 +21,4 @@ export async function POST(request: NextRequest) {
     return handleApiError(error);
   }
 }
+

@@ -41,6 +41,7 @@ export const createPilotSchema = z.object({
   name: z.string().trim().min(2, "Pilot name must be at least 2 characters"),
   email: z.string().trim().toLowerCase().email("Invalid email address"),
   password: z.string().min(6, "Initial password must be at least 6 characters"),
+  signatureImage: z.string().optional(), // base64 PNG data-URL — admin may pre-load it
 });
 
 export const adminResetPilotPasswordSchema = z.object({
@@ -57,6 +58,11 @@ export const refreshTokenSchema = z.object({
   refreshToken: z.string().min(1, "Refresh token is required"),
 });
 
+// Pilot self-service: update / (re)upload own saved signature
+export const updatePilotSignatureSchema = z.object({
+  signatureImage: z.string().min(1, "Signature image is required"),
+});
+
 // Inferred TypeScript Types
 export type LoginInput = z.infer<typeof loginSchema>;
 export type AdminRegisterInput = z.infer<typeof adminRegisterSchema>;
@@ -67,3 +73,4 @@ export type CreatePilotInput = z.infer<typeof createPilotSchema>;
 export type AdminResetPilotPasswordInput = z.infer<typeof adminResetPilotPasswordSchema>;
 export type TogglePilotStatusInput = z.infer<typeof togglePilotStatusSchema>;
 export type RefreshTokenInput = z.infer<typeof refreshTokenSchema>;
+export type UpdatePilotSignatureInput = z.infer<typeof updatePilotSignatureSchema>;

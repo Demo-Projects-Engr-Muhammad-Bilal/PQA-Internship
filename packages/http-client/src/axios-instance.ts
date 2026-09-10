@@ -25,10 +25,7 @@ export const createHttpClient = (
   config: HttpClientConfig,
   onSessionExpired?: () => void
 ): HttpClient => {
-  const tokenStorage = createTokenStorage(
-    config.storagePrefix,
-    config.cookieMaxAgeSeconds ?? DEFAULT_COOKIE_MAX_AGE_SECONDS
-  );
+  const tokenStorage = createTokenStorage();
 
   const instance = axios.create({
     baseURL: config.baseURL,

@@ -1,4 +1,13 @@
 import { z } from "zod";
+import { Prisma } from "@prisma/client";
+
+export type PilotFormWithRelations = Prisma.PilotFormGetPayload<{
+  include: { 
+    craftsUsed: true; 
+    pilot: { select: { name: true; email: true } };
+    hmDmUser: { select: { name: true; signatureImage: true } };
+  }
+}>;
 
 // Enums matching Prisma
 const ActivityTypeEnum = z.enum(["ARRIVAL", "DEPARTURE", "SHIFTING", "SWINGING", "CANCELLATION"]);
@@ -92,10 +101,11 @@ export const createPilotFormSchema = z
 
 export type CreatePilotFormInput = z.infer<typeof createPilotFormSchema>;
 
-// Schema for the Pilot's final submission (declaration + master signatures)
+// Schema for the Pilot's final submission (declaration + pilot + master signatures)
 export const submitFormSchema = z
   .object({
     isDeclared: z.literal(true, "You must declare the form contents are correct."),
+    pilotSignatureImage: z.string().min(1, "Your signature is required"), // Pilot's own signature snapshot
     masterSignature: z.string().min(1, "Master signature is required"),
     masterName: z.string().min(1, "Master name is required"),
     shipStampImage: z.string().min(1, "Ship stamp image is required"),

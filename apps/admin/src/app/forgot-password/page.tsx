@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { AuthCard, ForgotPasswordForm } from "@/components/shared";
+import { AuthCard, ForgotPasswordForm } from "@repo/ui";
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_ADMIN_API_URL || "http://localhost:5001";
 
@@ -17,7 +17,7 @@ export default function ForgotPasswordPage() {
     setIsLoading(true);
 
     try {
-      const response = await fetch(`${API_BASE_URL}/api/auth/forgot-password`, {
+      const response = await fetch(`${API_BASE_URL}/auth/forgot-password`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email }),
@@ -26,7 +26,7 @@ export default function ForgotPasswordPage() {
       // FIX: Check if response is actually JSON before parsing
       const contentType = response.headers.get("content-type");
       if (!contentType || !contentType.includes("application/json")) {
-        throw new Error("Backend API route (/api/auth/forgot-password) is missing or returned an HTML error page.");
+        throw new Error("Backend API route (/auth/forgot-password) is missing or returned an HTML error page.");
       }
 
       const data = await response.json();
