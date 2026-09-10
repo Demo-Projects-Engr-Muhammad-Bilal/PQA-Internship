@@ -13,13 +13,13 @@ export interface AuthenticatedRequest extends NextRequest {
  * Throws AuthError if missing or invalid.
  */
 export function extractAndVerifyToken(request: NextRequest): JWTPayload {
-  const authHeader = request.headers.get("authorization");
-  
-  if (!authHeader || !authHeader.startsWith("Bearer ")) {
+  const cookieToken = request.cookies.get("admin_access_token")?.value || request.cookies.get("pilot_access_token")?.value;
+  const headerToken = request.headers.get("authorization")?.split(" ")[1];
+  const token = cookieToken || headerToken;
+
+  if (!token) {
     throw new AuthError("MISSING_TOKEN", "Authorization token required", 401);
   }
-
-  const token = authHeader.split(" ")[1];
   
   try {
     return AuthCrypto.verifyAccessToken(token);
