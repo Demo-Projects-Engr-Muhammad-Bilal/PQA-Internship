@@ -4,7 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { AuthCard, ForgotPasswordForm } from "@repo/ui";
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_ADMIN_API_URL || "http://localhost:5001";
+const API_BASE_URL = process.env.NEXT_PUBLIC_ADMIN_API_URL || "/api";
 
 export default function ForgotPasswordPage() {
   const [error, setError] = useState<string | null>(null);

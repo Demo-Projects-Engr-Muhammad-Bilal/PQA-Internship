@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
-export function proxy(request: NextRequest) {
+export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   // 1. Generate a unique nonce per request for CSP
@@ -29,14 +29,9 @@ export function proxy(request: NextRequest) {
   requestHeaders.set("Content-Security-Policy", csp);
 
   // 3. Existing auth routing logic (preserved)
-  const token = request.cookies.get("admin_access_token")?.value;
+  const token = request.cookies.get("pilot_access_token")?.value;
 
-  const isAuthPage =
-    pathname === "/" ||
-    pathname.startsWith("/register") ||
-    pathname.startsWith("/forgot-password") ||
-    pathname.startsWith("/reset-password");
-
+  const isAuthPage = pathname === "/";
   const isDashboardPage = pathname.startsWith("/dashboard");
 
   // Rule 1: Not logged in → block dashboard, redirect to login
@@ -46,7 +41,7 @@ export function proxy(request: NextRequest) {
     return redirectResponse;
   }
 
-  // Rule 2: Already logged in → don't show auth pages, redirect to dashboard
+  // Rule 2: Already logged in → don't show login page again
   if (isAuthPage && token) {
     const redirectResponse = NextResponse.redirect(new URL("/dashboard", request.url));
     redirectResponse.headers.set("Content-Security-Policy", csp);
@@ -59,13 +54,6 @@ export function proxy(request: NextRequest) {
   return response;
 }
 
-// Ensure middleware runs only on these specific routes to optimize performance
 export const config = {
-  matcher: [
-    "/",
-    "/register",
-    "/forgot-password",
-    "/reset-password",
-    "/dashboard/:path*",
-  ],
+  matcher: ["/", "/dashboard/:path*"],
 };

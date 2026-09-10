@@ -131,8 +131,7 @@ export function AuthProvider({
 
       setError(null);
       setIsLoading(true);
-      console.log("2. Auth Context Called", { email, loginPortal });
-      try {
+            try {
         const { data } = await client.instance.post("/auth/login", {
           email,
           password,

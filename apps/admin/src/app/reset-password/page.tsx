@@ -5,7 +5,7 @@ import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { AuthCard, ResetPasswordForm } from "@repo/ui";
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_ADMIN_API_URL || "http://localhost:5001";
+const API_BASE_URL = process.env.NEXT_PUBLIC_ADMIN_API_URL || "/api";
 
 function ResetPasswordContent() {
   const searchParams = useSearchParams();

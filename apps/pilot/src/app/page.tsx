@@ -11,8 +11,7 @@ export default function PilotLoginPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleLogin = async (credentials: { email: string; password: string }) => {
-    console.log("1. Form Submitted", credentials);
-    clearError?.();
+        clearError?.();
     setIsSubmitting(true);
     try {
       await login(credentials.email, credentials.password, "pilot");

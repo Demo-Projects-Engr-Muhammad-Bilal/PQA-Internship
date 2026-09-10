@@ -5,8 +5,7 @@ import { PilotAuthService, buildApiResponse, authRateLimiter } from "@repo/servi
 import { loginSchema } from "@repo/types";
 
 export async function POST(request: NextRequest) {
-  console.log("4. Backend Route Hit - " + request.url);
-  try {
+    try {
     const ip = (request as any).ip ?? "127.0.0.1";
     if (authRateLimiter) {
       const { success } = await authRateLimiter.limit(ip);
