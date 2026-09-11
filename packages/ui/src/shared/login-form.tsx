@@ -38,6 +38,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({
 
   return (
     <form 
+      method="POST"
       className="space-y-5" 
       onSubmit={(e) => { 
         e.preventDefault(); 
