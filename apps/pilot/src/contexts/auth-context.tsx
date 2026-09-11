@@ -157,12 +157,7 @@ export function AuthProvider({
   const logout = useCallback(async () => {
     setIsLoading(true);
     try {
-      const storedRefreshToken = client.tokenStorage.getRefreshToken();
-      if (storedRefreshToken) {
-        await client.instance.post("/auth/logout", {
-          refreshToken: storedRefreshToken,
-        });
-      }
+      await client.instance.post("/auth/logout");
     } catch {
       // Clear local state regardless — an unreachable backend shouldn't
       // trap the user in a "still logged in" UI.

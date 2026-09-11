@@ -209,29 +209,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
               </div>
               <SidebarNav />
             </SidebarContent>
-            <SidebarFooter>
-              <SidebarMenu>
-                <SidebarMenuItem>
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <SidebarMenuButton className="group-data-[collapsible=icon]:!justify-center group-data-[collapsible=icon]:!px-0">
-                          <Avatar className="size-8">
-                          <AvatarFallback>PI</AvatarFallback>
-                        </Avatar>
-                        <span className="truncate text-sm group-data-[collapsible=icon]:hidden">Pilot User</span>
-                      </SidebarMenuButton>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent side="top" align="end" className="w-56">
-                      <DropdownMenuLabel>My Account</DropdownMenuLabel>
-                      <DropdownMenuSeparator />
-                      <DropdownMenuItem onClick={() => {}} className="text-destructive">
-                        Logout
-                      </DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                </SidebarMenuItem>
-              </SidebarMenu>
-            </SidebarFooter>
+
             <SidebarRail />
           </Sidebar>
         </div>
