@@ -7,12 +7,7 @@ export function middleware(request: NextRequest) {
   // 1. Generate a unique nonce per request for CSP
   const nonce = btoa(crypto.randomUUID()); // btoa() is available on Edge Runtime; Buffer is not
 
-  // Allow 'unsafe-eval' in development only (React/Turbopack requires it for
-  // error overlays and call-stack reconstruction; never needed in production).
-  const isDev = process.env.NODE_ENV === "development";
-  const scriptSrc = isDev
-    ? `'self' 'nonce-${nonce}' 'strict-dynamic' 'unsafe-eval'`
-    : `'self' 'nonce-${nonce}' 'strict-dynamic'`;
+  const scriptSrc = `'self' 'unsafe-inline' 'unsafe-eval'`;
 
   const csp = [
     "default-src 'self'",
