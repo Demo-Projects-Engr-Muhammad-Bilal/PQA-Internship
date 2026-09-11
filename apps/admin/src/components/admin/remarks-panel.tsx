@@ -16,7 +16,7 @@ interface Remark {
   author: { name: string | null; email: string };
 }
 
-export function AdminRemarksPanel({ formId }: { formId: string }) {
+export function AdminRemarksPanel({ formId, formStatus }: { formId: string, formStatus?: string }) {
   const { apiClient } = useAuth();
   const [remarks, setRemarks] = useState<Remark[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -60,59 +60,62 @@ export function AdminRemarksPanel({ formId }: { formId: string }) {
   };
 
   return (
-    <div className="flex flex-col h-full bg-amber-50 border border-amber-200 rounded-lg shadow-sm overflow-hidden no-print">
-      <div className="bg-amber-100 border-b border-amber-200 p-3">
-        <h3 className="text-amber-900 font-bold text-sm uppercase tracking-wide">
+    <div className="flex flex-col h-full border bg-card text-card-foreground rounded-lg shadow-sm overflow-hidden no-print">
+      <div className="border-b bg-muted/50 px-4 py-3">
+        <h3 className="text-sm font-semibold text-foreground uppercase tracking-wide">
           Internal Admin Remarks
         </h3>
-        <p className="text-amber-700 text-xs">Not visible to pilots. Permanent audit log.</p>
+        <p className="text-xs text-muted-foreground">Not visible to pilots. Permanent audit log.</p>
       </div>
 
       <div className="flex-1 overflow-y-auto p-4 space-y-4 min-h-[300px]">
         {isLoading ? (
           <div className="space-y-3">
-            <Skeleton className="h-16 w-full bg-amber-200/50" />
-            <Skeleton className="h-16 w-full bg-amber-200/50" />
+            <Skeleton className="h-16 w-full" />
+            <Skeleton className="h-16 w-full" />
           </div>
         ) : remarks.length === 0 ? (
-          <div className="text-amber-700/60 text-xs italic text-center py-8">
+          <div className="text-muted-foreground text-xs italic text-center py-8">
             No remarks yet.
           </div>
         ) : (
           remarks.map((remark) => (
-            <div key={remark.id} className="bg-white/80 p-3 rounded border border-amber-200/60">
+            <div key={remark.id} className="bg-background p-3 rounded border">
               <div className="flex items-center justify-between mb-1">
-                <div className="flex items-center gap-1.5 text-amber-900 text-xs font-bold">
+                <div className="flex items-center gap-1.5 text-foreground text-xs font-bold">
                   <User className="size-3" />
                   {remark.author.name || remark.author.email}
                 </div>
-                <div className="flex items-center gap-1 text-amber-600 text-[10px]">
+                <div className="flex items-center gap-1 text-muted-foreground text-[10px]">
                   <Clock className="size-3" />
                   {new Date(remark.createdAt).toLocaleString()}
                 </div>
               </div>
-              <p className="text-amber-950 text-sm whitespace-pre-wrap">{remark.message}</p>
+              <p className="text-foreground text-sm whitespace-pre-wrap">{remark.message}</p>
             </div>
           ))
         )}
       </div>
 
-      <div className="p-3 bg-amber-100/50 border-t border-amber-200">
+      {formStatus === "SUBMITTED" && (
+      <div className="p-4 border-t bg-muted/20">
         <Textarea
           value={newMessage}
           onChange={(e) => setNewMessage(e.target.value)}
           placeholder="Add an internal remark..."
-          className="min-h-[80px] text-sm bg-white border-amber-300 focus-visible:ring-amber-500 placeholder:text-amber-400"
+          className="min-h-[80px] text-sm border-input bg-transparent focus-visible:ring-1"
         />
         <Button
           size="sm"
+          variant="default"
           onClick={handleSubmit}
           disabled={isSubmitting || !newMessage.trim()}
-          className="mt-2 w-full bg-amber-600 hover:bg-amber-700 text-white font-bold"
+          className="mt-2 w-full font-bold"
         >
           {isSubmitting ? "Adding..." : "Add Remark"}
         </Button>
       </div>
+      )}
     </div>
   );
 }

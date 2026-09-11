@@ -9,6 +9,7 @@ export class AdminFormService {
   // 1. Get all forms (System-wide view for Admin)
   public static async getAllForms() {
     return db.pilotForm.findMany({
+      where: { status: { not: "DRAFT" } },
       select: {
         id: true, serialNo: true, status: true, activityType: true,
         activityDateTime: true, vesselName: true, vesselType: true,
@@ -118,7 +119,7 @@ export class AdminFormService {
   }) {
     return db.pilotForm.findMany({
       where: {
-        status: filters.status,
+        status: filters.status || { not: "DRAFT" },
         vesselType: filters.vesselType as any,
         activityType: filters.activityType as any,
         createdAt: {

@@ -167,10 +167,7 @@ body {
    ============================================================ */
 
 @media print {
-  @page {
-    size: A4;
-    margin: 12mm 8mm; /* real page margins now come from @page, not from .form-page padding */
-  }
+  @page { size: A4; margin: 0mm; }
 
   html,
   body {
@@ -215,9 +212,12 @@ body {
     padding: 0;           /* margin now comes from @page */
     box-sizing: border-box;
     overflow: visible;    /* was hidden — the actual bug fix */
+      transform: scale(0.95);
+      transform-origin: top center;
     box-shadow: none !important;
     border: none !important;
-  }
+  
+    margin: 15mm auto !important;}
 
   /* Keep atomic sections intact instead of splitting mid-block across a page boundary */
   .form-section,

@@ -21,19 +21,7 @@ export default function Step1General() {
       </div>
 
       <div className="grid grid-cols-1 gap-x-6 gap-y-8 md:grid-cols-2">
-        <FormField
-          control={control}
-          name="serialNo"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel className="text-xs font-bold uppercase tracking-wider text-primary">Serial No.</FormLabel>
-              <FormControl>
-                <Input className="h-11 focus-visible:ring-accent" placeholder="e.g., 55201" {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+        
 
         <FormField
           control={control}
@@ -42,7 +30,7 @@ export default function Step1General() {
             <FormItem>
               <FormLabel className="text-xs font-bold uppercase tracking-wider text-primary">Local Agency</FormLabel>
               <FormControl>
-                <Input className="h-11 focus-visible:ring-accent" placeholder="Agency Name" {...field} />
+                <Input className="h-11 focus-visible:ring-accent" placeholder="Agency Name" {...field} value={field.value || ""} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -83,7 +71,7 @@ export default function Step1General() {
               <FormControl>
                 <DateTimePicker
                   date={field.value ? new Date(field.value) : undefined}
-                  setDate={(date) => field.onChange(date ? date.toISOString() : undefined)}
+                  setDate={field.onChange}
                 />
               </FormControl>
               <FormMessage />
@@ -102,7 +90,7 @@ export default function Step1General() {
                   <div className="border border-destructive rounded-md overflow-hidden">
                     <DateTimePicker
                       date={field.value ? new Date(field.value) : undefined}
-                      setDate={(date) => field.onChange(date ? date.toISOString() : undefined)}
+                      setDate={field.onChange}
                     />
                   </div>
                 </FormControl>
@@ -145,7 +133,7 @@ export default function Step1General() {
             <FormItem>
               <FormLabel className="text-xs font-bold uppercase tracking-wider text-primary">Vessel's Name</FormLabel>
               <FormControl>
-                <Input className="h-11 focus-visible:ring-accent" placeholder="e.g., Al-Qasim Star" {...field} />
+                <Input className="h-11 focus-visible:ring-accent" placeholder="e.g., Al-Qasim Star" {...field} value={field.value || ""} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -159,7 +147,7 @@ export default function Step1General() {
             <FormItem>
               <FormLabel className="text-xs font-bold uppercase tracking-wider text-primary">Registration No.</FormLabel>
               <FormControl>
-                <Input className="h-11 focus-visible:ring-accent" placeholder="Registration ID" {...field} />
+                <Input className="h-11 focus-visible:ring-accent" placeholder="Registration ID" {...field} value={field.value || ""} />
               </FormControl>
               <FormMessage />
             </FormItem>

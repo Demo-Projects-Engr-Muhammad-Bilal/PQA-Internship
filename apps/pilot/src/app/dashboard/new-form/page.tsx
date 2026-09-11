@@ -6,8 +6,8 @@ import PilotFormWizard from "@/components/pilot/form/PilotFormWizard";
 
 export default function NewFormPage() {
   return (
-    <div className="min-h-screen bg-gray-50/50 py-10 px-4 sm:px-6 lg:px-8">
-      <div className="mx-auto mb-8 flex w-full items-center justify-between">
+    <div className="w-full h-full min-h-[calc(100vh-120px)] flex flex-col pb-6">
+      <div className="mb-2 flex w-full items-start justify-between gap-4">
         <div>
           <h1 className="text-3xl font-bold tracking-tight text-primary">New Pilot Form Submission</h1>
           <p className="mt-1 text-sm font-medium text-muted-foreground">Fill out the official Port Qasim Authority pilot form.</p>
@@ -22,7 +22,7 @@ export default function NewFormPage() {
       </div>
 
       {/* The Wizard Component automatically inherits the theme we applied to it in Phase 2 */}
-      <PilotFormWizard />
+      <div className="my-5"><PilotFormWizard /></div>
     </div>
   );
 }

@@ -88,13 +88,14 @@ export function CreatePilotDialog({ apiClient, onPilotCreated }: CreatePilotDial
         </DialogHeader>
 
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 py-4">
+          <form onSubmit={form.handleSubmit(onSubmit)}>
+            <div className="flex-1 overflow-y-auto pr-2 max-h-[60vh] space-y-4 py-4">
             <FormField
               control={form.control}
               name="name"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="text-xs font-bold uppercase tracking-wider text-primary">Full Name (Optional)</FormLabel>
+                  <FormLabel className="text-sm font-medium">Full Name (Optional)</FormLabel>
                   <FormControl>
                     <Input className="h-11 border-gray-200 focus-visible:ring-primary" placeholder="Capt. John Doe" disabled={isSubmitting} {...field} />
                   </FormControl>
@@ -108,7 +109,7 @@ export function CreatePilotDialog({ apiClient, onPilotCreated }: CreatePilotDial
               name="email"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="text-xs font-bold uppercase tracking-wider text-primary">Email Address</FormLabel>
+                  <FormLabel className="text-sm font-medium">Email Address</FormLabel>
                   <FormControl>
                     <Input
                       className="h-11 border-gray-200 focus-visible:ring-primary"
@@ -128,7 +129,7 @@ export function CreatePilotDialog({ apiClient, onPilotCreated }: CreatePilotDial
               name="password"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="text-xs font-bold uppercase tracking-wider text-primary">Initial Password</FormLabel>
+                  <FormLabel className="text-sm font-medium">Initial Password</FormLabel>
                   <FormControl>
                     <div className="relative">
                       <Input
@@ -155,12 +156,13 @@ export function CreatePilotDialog({ apiClient, onPilotCreated }: CreatePilotDial
             />
 
             <div className="space-y-2">
-              <Label className="text-xs font-bold uppercase tracking-wider text-primary">
+              <Label className="text-sm font-medium">
                 Pilot Signature (optional — can be added later from the pilot's profile)
               </Label>
               <SignaturePad ref={sigPadRef} label="Draw the pilot's signature" />
             </div>
 
+            </div>
             <DialogFooter className="pt-4 sm:space-x-4">
               <Button
                 type="button"

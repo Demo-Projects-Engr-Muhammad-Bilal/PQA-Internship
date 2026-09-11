@@ -34,7 +34,8 @@ export default function PilotDashboard() {
 
   useEffect(() => {
     ensureMyForms();
-  }, [ensureMyForms]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const forms = myForms.data ?? [];
   const isLoading = myForms.status === "loading" || myForms.status === "idle";
@@ -52,15 +53,15 @@ export default function PilotDashboard() {
   const currentForms = filteredForms.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
 
   return (
-    <div className="min-h-screen bg-muted/30 p-8">
-      <div className="mx-auto max-w-6xl">
+    <div className="min-h-screen bg-muted/30">
+      <div className="w-full">
         {/* Forms Table */}
         <Card className="gap-0 overflow-hidden py-0">
-          <CardHeader className="flex flex-row items-center justify-between border-b bg-primary/5 py-4 space-y-0">
+          <CardHeader className="flex flex-col lg:flex-row items-start lg:items-center justify-between border-b bg-primary/5 py-4 space-y-4 lg:space-y-0">
             <CardTitle className="text-lg">My Pilot Forms</CardTitle>
-            <div className="flex items-center gap-3">
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:flex items-center gap-2 w-full lg:w-auto">
               <Select value={statusFilter} onValueChange={setStatusFilter}>
-                <SelectTrigger className="w-[180px] bg-white h-9">
+                <SelectTrigger className="w-full lg:w-[180px] bg-white h-9">
                   <SelectValue placeholder="Filter by Status" />
                 </SelectTrigger>
                 <SelectContent position="popper">
@@ -73,7 +74,7 @@ export default function PilotDashboard() {
               </Select>
               <Button
                 size="sm"
-                variant="outline"
+                variant="default"
                 onClick={() => refreshData()}
                 disabled={myForms.status === "loading"}
               >
@@ -86,7 +87,8 @@ export default function PilotDashboard() {
           </CardHeader>
 
           <CardContent className="px-0 py-0">
-            <Table>
+            <div className="overflow-x-auto w-full">
+<Table>
               <TableHeader>
                 <TableRow className="bg-muted/50 text-sm text-muted-foreground">
                   <TableHead className="p-4">Serial No.</TableHead>
@@ -133,6 +135,7 @@ export default function PilotDashboard() {
                 )}
               </TableBody>
             </Table>
+</div>
             
             {!isLoading && filteredForms.length > 0 && (
               <div className="flex items-center justify-between px-4 py-3 border-t bg-muted/20">

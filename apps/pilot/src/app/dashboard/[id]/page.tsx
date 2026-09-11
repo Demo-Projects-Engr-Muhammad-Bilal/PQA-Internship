@@ -54,8 +54,8 @@ export default function PilotFormDetailPage({
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gray-50 p-6">
-        <div className="max-w-5xl mx-auto">
+      <div className="min-h-screen bg-gray-50">
+        <div className="w-full">
           <Skeleton className="h-96 w-full rounded-lg" />
         </div>
       </div>
@@ -64,8 +64,8 @@ export default function PilotFormDetailPage({
 
   if (error || !formData) {
     return (
-      <div className="min-h-screen bg-gray-50 p-6">
-        <div className="max-w-5xl mx-auto">
+      <div className="min-h-screen bg-gray-50">
+        <div className="w-full">
           <Alert variant="destructive">
             <AlertTriangle className="h-4 w-4" />
             <AlertDescription>{error || "Form not found"}</AlertDescription>
@@ -83,16 +83,14 @@ export default function PilotFormDetailPage({
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 p-6">
-      <div className="max-w-5xl mx-auto space-y-4">
+    <div className="min-h-screen bg-gray-50">
+      <div className="w-full space-y-4">
         {/* Action Bar - Hidden on Print */}
         <div className="no-print flex items-center gap-2 mb-6">
           <Button variant="outline" size="sm" asChild>
             <Link href="/dashboard">← Back to Dashboard</Link>
           </Button>
-          <Button size="sm" onClick={() => window.print()}>
-            🖨️ Print Form
-          </Button>
+          
           <span
             className={`ml-auto text-[11px] font-semibold px-2 py-1 rounded ${statusStyles[formData.status]}`}
           >
@@ -101,8 +99,10 @@ export default function PilotFormDetailPage({
         </div>
 
         {/* Form Container — the ONLY thing visible when printing */}
+        <div className="overflow-x-auto w-full pb-8">
         <div className="print-only-form form-page bg-white text-black">
           <FormContent form={formData} />
+        </div>
         </div>
       </div>
     </div>

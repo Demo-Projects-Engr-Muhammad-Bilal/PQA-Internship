@@ -6,7 +6,7 @@ import {
   FormField, FormItem, FormLabel, FormControl, FormMessage,
   Input, Card, CardContent, Checkbox,
 } from "@repo/ui";
-import { toDatetimeLocalValue } from "../date-utils";
+import { DateTimePicker } from "@repo/ui/ui/date-time-picker";
 
 export default function Step2Berthing() {
   const { control } = useFormContext<CreatePilotFormInput>();
@@ -26,7 +26,10 @@ export default function Step2Berthing() {
             <FormItem>
               <FormLabel className="text-xs font-bold uppercase tracking-wider text-primary">Pilot Boarding (Date/Time) *</FormLabel>
               <FormControl>
-                <Input className="h-11 focus-visible:ring-accent" type="datetime-local" {...field} value={toDatetimeLocalValue(field.value)} />
+                <DateTimePicker
+                  date={field.value ? new Date(field.value) : undefined}
+                  setDate={field.onChange}
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -40,7 +43,10 @@ export default function Step2Berthing() {
             <FormItem>
               <FormLabel className="text-xs font-bold uppercase tracking-wider text-primary">Pilot Disembarkation (Date/Time) *</FormLabel>
               <FormControl>
-                <Input className="h-11 focus-visible:ring-accent" type="datetime-local" {...field} value={toDatetimeLocalValue(field.value)} />
+                <DateTimePicker
+                  date={field.value ? new Date(field.value) : undefined}
+                  setDate={field.onChange}
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -82,7 +88,10 @@ export default function Step2Berthing() {
             <FormItem>
               <FormLabel className="text-xs font-bold uppercase tracking-wider text-primary">Unmoored (Date/Time)</FormLabel>
               <FormControl>
-                <Input className="h-11 focus-visible:ring-accent" type="datetime-local" {...field} value={toDatetimeLocalValue(field.value)} />
+                <DateTimePicker
+                  date={field.value ? new Date(field.value) : undefined}
+                  setDate={field.onChange}
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -110,7 +119,10 @@ export default function Step2Berthing() {
             <FormItem>
               <FormLabel className="text-xs font-bold uppercase tracking-wider text-primary">Moored (Date/Time)</FormLabel>
               <FormControl>
-                <Input className="h-11 focus-visible:ring-accent" type="datetime-local" {...field} value={toDatetimeLocalValue(field.value)} />
+                <DateTimePicker
+                  date={field.value ? new Date(field.value) : undefined}
+                  setDate={field.onChange}
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -142,7 +154,11 @@ export default function Step2Berthing() {
               render={({ field }) => (
                 <FormItem className="flex items-center gap-3 space-y-0">
                   <FormControl>
-                    <Checkbox className="data-[state=checked]:bg-accent data-[state=checked]:border-accent" checked={field.value} onCheckedChange={field.onChange} />
+                    <Checkbox
+                      checked={field.value}
+                      onCheckedChange={field.onChange}
+                      
+                    />
                   </FormControl>
                   <FormLabel className="cursor-pointer font-semibold text-primary">Night Operation</FormLabel>
                 </FormItem>
@@ -154,7 +170,11 @@ export default function Step2Berthing() {
               render={({ field }) => (
                 <FormItem className="flex items-center gap-3 space-y-0">
                   <FormControl>
-                    <Checkbox className="data-[state=checked]:bg-accent data-[state=checked]:border-accent" checked={field.value} onCheckedChange={field.onChange} />
+                    <Checkbox
+                      checked={field.value}
+                      onCheckedChange={field.onChange}
+                      
+                    />
                   </FormControl>
                   <FormLabel className="cursor-pointer font-semibold text-primary">Public Holiday</FormLabel>
                 </FormItem>

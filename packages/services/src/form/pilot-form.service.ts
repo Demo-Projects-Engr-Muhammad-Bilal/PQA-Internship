@@ -8,11 +8,24 @@ export class PilotFormService {
   public static async createForm(pilotId: string, input: CreatePilotFormInput) {
     // craftsUsed ko alag nikal lein taake Prisma query theek se banay
     const { craftsUsed, ...formData } = input;
+  try {
+      // Auto-generate serialNo
+      let newSerialNo = "55000";
+      const lastForm = await db.pilotForm.findFirst({
+        orderBy: { createdAt: 'desc' },
+        select: { serialNo: true }
+      });
+      if (lastForm && lastForm.serialNo) {
+        const parsed = parseInt(lastForm.serialNo, 10);
+        if (!isNaN(parsed)) {
+          newSerialNo = (parsed + 1).toString();
+        }
+      }
 
-    try {
       const form = await db.pilotForm.create({
         data: {
-          ...formData,
+            ...formData,
+            serialNo: newSerialNo,
           pilotId,
           status: "DRAFT",
           craftsUsed: craftsUsed ? {

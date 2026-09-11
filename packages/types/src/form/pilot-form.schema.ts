@@ -18,6 +18,28 @@ const CraftTypeEnum = z.enum(["PILOT_BOAT", "TUG", "MOORING_BOAT", "ESCORTING_TU
 // "true"/"false" string a native <RadioGroup> reports, and normalizes
 // both to a boolean. Lets the frontend keep radio values as strings
 // without a manual setValueAs on every field.
+
+const requiredDate = (errorMsg: string) => z.preprocess(
+  (arg) => {
+    if (arg === "" || arg === null || arg === undefined) return arg;
+    return new Date(arg as string | number | Date);
+  },
+  z.custom<Date>((val) => val instanceof Date && !isNaN(val.getTime()), errorMsg)
+);
+
+// z.coerce.number() runs Number(arg) under the hood (so it still accepts a
+// stray numeric string from an old localStorage draft or a raw form value),
+// but — unlike the old z.preprocess + z.custom<number> combo — it's a real
+// Zod number type: NaN, "", null and undefined are all rejected up front by
+// the base type check, and .positive()/.nonnegative() reject bad magnitudes.
+// The same errorMsg is used for both the type check and the range check so
+// "missing" and "invalid" collapse into one clear message.
+const requiredPositiveNumber = (errorMsg: string) =>
+  z.coerce.number({ error: errorMsg }).positive({ error: errorMsg });
+
+const requiredNonNegativeNumber = (errorMsg: string) =>
+  z.coerce.number({ error: errorMsg }).nonnegative({ error: errorMsg });
+
 const booleanFromRadio = z
   .union([z.boolean(), z.string()])
   .transform((v) => v === true || v === "true")
@@ -34,11 +56,11 @@ export const craftUsageSchema = z.object({
 // Main Pilot Form Schema
 export const createPilotFormSchema = z
   .object({
-    serialNo: z.string().min(1, "Serial number is required"),
+    serialNo: z.string().optional(),
 
     // General Info
     activityType: ActivityTypeEnum,
-    activityDateTime: z.coerce.date(),
+    activityDateTime: requiredDate("Please select an activity date and time"),
     cancellationDateTime: z.coerce.date().optional().nullable(),
 
     // Vessel Details
@@ -49,8 +71,8 @@ export const createPilotFormSchema = z
     localAgency: z.string().min(1, "Local agency is required"),
 
     // Pilotage & Berthing
-    boardingDate: z.coerce.date(),
-    disembarkationDate: z.coerce.date(),
+    boardingDate: requiredDate("Please select the boarding date and time"),
+    disembarkationDate: requiredDate("Please select the disembarkation date and time"),
     berthSide: z.string().optional().nullable(),
     unmooredDate: z.coerce.date().optional().nullable(),
     unmooredPlace: z.string().optional().nullable(),
@@ -63,19 +85,19 @@ export const createPilotFormSchema = z
     dispensation: z.string().optional().nullable(),
 
     // Vessel Dimensions
-    loa: z.number().positive(),
-    beam: z.number().positive(),
-    gt: z.number().positive(),
-    nt: z.number().positive(),
-    dwt: z.number().positive(),
-    draftFwd: z.number().positive(),
-    draftAft: z.number().positive(),
+    loa: requiredPositiveNumber("LOA must be a positive number"),
+    beam: requiredPositiveNumber("Beam must be a positive number"),
+    gt: requiredPositiveNumber("GT must be a positive number"),
+    nt: requiredPositiveNumber("NT must be a positive number"),
+    dwt: requiredPositiveNumber("DWT must be a positive number"),
+    draftFwd: requiredPositiveNumber("Forward Draft must be a positive number"),
+    draftAft: requiredPositiveNumber("Aft Draft must be a positive number"),
 
     // Cargo Details
-    cargoPQ: z.number().min(0),
-    deckCargo: z.number().min(0),
-    dgCargo: z.number().min(0),
-    totalCargo: z.number().min(0),
+    cargoPQ: requiredNonNegativeNumber("Cargo cannot be negative"),
+    deckCargo: requiredNonNegativeNumber("Deck Cargo cannot be negative"),
+    dgCargo: requiredNonNegativeNumber("DG Cargo cannot be negative"),
+    totalCargo: requiredNonNegativeNumber("Total Cargo cannot be negative"),
 
     // Safety — stored as booleans in Prisma, but the Step 4 <RadioGroup>
     // reports "true"/"false" strings, so these coerce either shape.
@@ -89,14 +111,6 @@ export const createPilotFormSchema = z
 
     // Nested Relation
     craftsUsed: z.array(craftUsageSchema).optional(),
-  })
-  .refine((data) => data.boardingDate >= data.activityDateTime, {
-    message: "Boarding date must be on or after the activity date/time",
-    path: ["boardingDate"],
-  })
-  .refine((data) => data.disembarkationDate > data.boardingDate, {
-    message: "Disembarkation date must be after the boarding date",
-    path: ["disembarkationDate"],
   });
 
 export type CreatePilotFormInput = z.infer<typeof createPilotFormSchema>;

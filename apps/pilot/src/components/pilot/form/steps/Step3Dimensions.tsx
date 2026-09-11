@@ -37,9 +37,17 @@ function NumericField({ name, label, placeholder = "0.00", unit }: NumericFieldP
                 className={`h-11 focus-visible:ring-accent ${unit ? "pr-12" : ""}`}
                 {...field}
                 value={field.value ?? ""}
-                onChange={(e) =>
-                  field.onChange(e.target.value === "" ? "" : e.target.valueAsNumber)
-                }
+                onChange={(e) => {
+                  // Never hand the schema an empty string or a NaN: both are
+                  // "no value yet" from the user's point of view, but a bare
+                  // NaN is typeof "number" so it used to slip past the old
+                  // `e.target.value === ""` guard and fail validation with a
+                  // confusing "must be positive" error even though the field
+                  // looked filled in. Collapse both cases to `undefined`.
+                  const raw = e.target.value;
+                  const parsed = e.target.valueAsNumber;
+                  field.onChange(raw === "" || Number.isNaN(parsed) ? undefined : parsed);
+                }}
               />
               {unit && (
                 <span className="pointer-events-none absolute top-1/2 right-4 -translate-y-1/2 text-xs font-bold text-muted-foreground">
@@ -64,7 +72,7 @@ export default function Step3Dimensions() {
       </div>
 
       <div>
-        <h3 className="mb-6 text-sm font-bold tracking-widest text-accent uppercase">Vessel Dimensions (Meters / Tonnages)</h3>
+        <h3 className="mb-6 text-sm font-bold tracking-widest text-primary uppercase">Vessel Dimensions (Meters / Tonnages)</h3>
         <div className="grid grid-cols-2 gap-x-6 gap-y-8 lg:grid-cols-3">
           <NumericField name="loa" label="L.O.A. (m)" unit="m" />
           <NumericField name="beam" label="Beam (m)" unit="m" />
@@ -81,7 +89,7 @@ export default function Step3Dimensions() {
 
       <div>
         <Separator className="my-8 bg-gray-100" />
-        <h3 className="mb-6 text-sm font-bold tracking-widest text-accent uppercase">Cargo Breakdown (MTS)</h3>
+        <h3 className="mb-6 text-sm font-bold tracking-widest text-primary uppercase">Cargo Breakdown (MTS)</h3>
         <div className="grid grid-cols-1 gap-x-6 gap-y-8 md:grid-cols-2">
           <NumericField name="cargoPQ" label="Cargo for Port Qasim (MTS)" unit="MTS" />
           <NumericField name="deckCargo" label="Deck Cargo (MTS)" unit="MTS" />

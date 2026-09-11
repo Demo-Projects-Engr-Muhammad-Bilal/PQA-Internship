@@ -135,13 +135,13 @@ export default function AdminDashboard() {
   const currentForms = forms.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
 
   return (
-    <div className="min-h-screen bg-gray-50/50 p-8">
-      <div className="mx-auto max-w-7xl space-y-4">
+    <div className="min-h-screen bg-gray-50/50">
+      <div className="w-full space-y-4">
         
         {/* Filters Toolbar */}
         <Card className="bg-white border shadow-sm">
-          <CardContent className="p-4 flex flex-wrap gap-4 items-center">
-            <div className="relative flex-1 min-w-[200px]">
+          <CardContent className="p-4 flex flex-col lg:flex-row gap-4 items-start lg:items-center">
+            <div className="relative w-full lg:flex-1 lg:min-w-[200px]">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input 
                 placeholder="Search serial, vessel, pilot..." 
@@ -150,8 +150,9 @@ export default function AdminDashboard() {
                 onChange={(e) => setSearchQuery(e.target.value)}
               />
             </div>
+            <div className="grid grid-cols-2 md:grid-cols-4 lg:flex gap-2 w-full lg:w-auto">
             <Select value={statusFilter} onValueChange={setStatusFilter}>
-              <SelectTrigger className="w-[150px] h-9">
+              <SelectTrigger className="w-full lg:w-[150px] h-9">
                 <SelectValue placeholder="Status" />
               </SelectTrigger>
               <SelectContent>
@@ -163,7 +164,7 @@ export default function AdminDashboard() {
               </SelectContent>
             </Select>
             <Select value={vesselTypeFilter} onValueChange={setVesselTypeFilter}>
-              <SelectTrigger className="w-[150px] h-9">
+              <SelectTrigger className="w-full lg:w-[150px] h-9">
                 <SelectValue placeholder="Vessel" />
               </SelectTrigger>
               <SelectContent>
@@ -176,7 +177,7 @@ export default function AdminDashboard() {
               </SelectContent>
             </Select>
             <Select value={activityTypeFilter} onValueChange={setActivityTypeFilter}>
-              <SelectTrigger className="w-[150px] h-9">
+              <SelectTrigger className="w-full lg:w-[150px] h-9">
                 <SelectValue placeholder="Activity" />
               </SelectTrigger>
               <SelectContent>
@@ -187,9 +188,10 @@ export default function AdminDashboard() {
                 <SelectItem value="SWINGING">Swinging</SelectItem>
               </SelectContent>
             </Select>
-            <Button size="sm" variant="outline" onClick={fetchFilteredForms} disabled={isLoading} className="h-9">
+            <Button size="sm" variant="default" onClick={fetchFilteredForms} disabled={isLoading} className="h-9">
               {isLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : "Refresh"}
             </Button>
+            </div>
           </CardContent>
         </Card>
 
@@ -224,16 +226,10 @@ export default function AdminDashboard() {
         {/* Forms Table */}
         <Card className="gap-0 overflow-hidden py-0 shadow-sm border bg-white rounded-xl">
           <CardContent className="p-0">
-            <Table>
+            <div className="overflow-x-auto w-full">
+<Table>
               <TableHeader>
                 <TableRow className="bg-gray-100/80 border-b border-gray-200">
-                  <TableHead className="w-[40px] p-4">
-                    <Checkbox 
-                      checked={currentForms.length > 0 && selectedIds.size === currentForms.length}
-                      onCheckedChange={toggleSelectAll}
-                      aria-label="Select all"
-                    />
-                  </TableHead>
                   <TableHead className="p-4 text-xs font-bold uppercase tracking-wider text-primary">Serial No.</TableHead>
                   <TableHead className="p-4 text-xs font-bold uppercase tracking-wider text-primary">Pilot</TableHead>
                   <TableHead className="p-4 text-xs font-bold uppercase tracking-wider text-primary">Vessel Name</TableHead>
@@ -247,30 +243,20 @@ export default function AdminDashboard() {
                 {isLoading ? (
                   Array.from({length: 4}).map((_, i) => (
                     <TableRow key={i}>
-                      {Array.from({length: 8}).map((_, j) => (
+                      {Array.from({length: 7}).map((_, j) => (
                         <TableCell key={j}><Skeleton className="h-8 w-full" /></TableCell>
                       ))}
                     </TableRow>
                   ))
                 ) : forms.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={8} className="p-8 text-center text-muted-foreground italic font-medium">No forms match your filters.</TableCell>
+                    <TableCell colSpan={7} className="p-8 text-center text-muted-foreground italic font-medium">No forms match your filters.</TableCell>
                   </TableRow>
                 ) : (
                   currentForms.map((form) => {
                     const isPending = form.status === "SUBMITTED";
                     return (
                       <TableRow key={form.id} className="hover:bg-gray-50/50 transition-colors border-b border-gray-100">
-                        <TableCell className="p-4">
-                          {isPending ? (
-                            <Checkbox 
-                              checked={selectedIds.has(form.id)} 
-                              onCheckedChange={() => toggleSelection(form.id)}
-                            />
-                          ) : (
-                            <div className="w-4 h-4 rounded border bg-gray-100 opacity-50 cursor-not-allowed" title="Only pending forms can be bulk updated" />
-                          )}
-                        </TableCell>
                         <TableCell className="p-4 font-bold text-primary">{form.serialNo}</TableCell>
                         <TableCell className="p-4 font-medium">{form.pilot.name || form.pilot.email}</TableCell>
                         <TableCell className="p-4 font-medium text-gray-700">{form.vesselName}</TableCell>
@@ -290,6 +276,7 @@ export default function AdminDashboard() {
                 )}
               </TableBody>
             </Table>
+</div>
 
             {!isLoading && forms.length > 0 && (
               <div className="flex items-center justify-between px-4 py-3 border-t bg-gray-50/50">

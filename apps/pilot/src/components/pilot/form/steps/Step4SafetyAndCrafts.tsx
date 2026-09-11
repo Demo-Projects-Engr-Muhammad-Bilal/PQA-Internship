@@ -24,7 +24,7 @@ function DgQuestion({ name, question }: DgQuestionProps) {
       control={control}
       name={name}
       render={({ field }) => (
-        <FormItem className="flex items-center justify-between space-y-0 rounded-lg border border-gray-200 bg-white p-4 shadow-sm">
+        <FormItem className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 rounded-lg border border-gray-200 bg-white p-4 shadow-sm">
           <FormLabel className="flex-1 pr-4 font-semibold text-primary">{question}</FormLabel>
           <FormControl>
             <RadioGroup
@@ -61,7 +61,7 @@ export default function Step4SafetyAndCrafts() {
 
       <Card className="border-primary/10 shadow-md">
         <CardHeader className="bg-gray-50/50 border-b border-gray-100 pb-4">
-          <CardTitle className="text-sm font-bold tracking-widest text-accent uppercase">
+          <CardTitle className="text-sm font-bold text-primary tracking-wider mb-4 uppercase">
             Safety & Dangerous Goods (DG)
           </CardTitle>
         </CardHeader>
@@ -74,8 +74,9 @@ export default function Step4SafetyAndCrafts() {
 
       <div className="pt-6">
         <div className="mb-4 flex items-center justify-between">
-          <h3 className="text-sm font-bold tracking-widest text-accent uppercase">Crafts Used (Tugs / Pilot Boats)</h3>
+          <h3 className="text-sm font-bold text-primary tracking-wider mb-4 uppercase">Crafts Used (Tugs / Pilot Boats)</h3>
           <Button
+          variant="secondary"
             type="button"
             size="sm"
             className="bg-white text-accent border border-accent hover:bg-accent hover:text-white transition-colors"
@@ -85,15 +86,16 @@ export default function Step4SafetyAndCrafts() {
           </Button>
         </div>
 
-        <div className="overflow-hidden rounded-xl border border-gray-200 shadow-sm">
+        <div className="overflow-x-auto w-full pb-2">
+          <div className="overflow-hidden rounded-xl border border-gray-200 shadow-sm min-w-[700px]">
           <Table>
             <TableHeader>
               <TableRow className="bg-primary hover:bg-primary border-b-0">
-                <TableHead className="text-xs font-semibold tracking-wider text-white uppercase h-10">Craft Type</TableHead>
-                <TableHead className="text-xs font-semibold tracking-wider text-white uppercase h-10">Craft Name</TableHead>
-                <TableHead className="text-xs font-semibold tracking-wider text-white uppercase h-10">From Location</TableHead>
-                <TableHead className="text-xs font-semibold tracking-wider text-white uppercase h-10">To Location</TableHead>
-                <TableHead className="text-xs font-semibold tracking-wider text-white uppercase h-10 text-right">Action</TableHead>
+                <TableHead className="p-3 text-xs font-semibold tracking-wider text-white uppercase h-10">Craft Type</TableHead>
+                <TableHead className="p-3 text-xs font-semibold tracking-wider text-white uppercase h-10">Craft Name</TableHead>
+                <TableHead className="p-3 text-xs font-semibold tracking-wider text-white uppercase h-10">From Location</TableHead>
+                <TableHead className="p-3 text-xs font-semibold tracking-wider text-white uppercase h-10">To Location</TableHead>
+                <TableHead className="p-3 text-xs font-semibold tracking-wider text-white uppercase h-10 text-right">Action</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody className="bg-white">
@@ -106,7 +108,7 @@ export default function Step4SafetyAndCrafts() {
               ) : (
                 fields.map((field, index) => (
                   <TableRow key={field.id} className="hover:bg-gray-50/50">
-                    <TableCell className="p-3">
+                    <TableCell className="p-3 align-top">
                       <FormField
                         control={control}
                         name={`craftsUsed.${index}.craftType`}
@@ -125,14 +127,14 @@ export default function Step4SafetyAndCrafts() {
                         )}
                       />
                     </TableCell>
-                    <TableCell className="p-3">
-                      <Input className="h-9 text-sm focus-visible:ring-accent" placeholder="e.g., Tug 2" {...register(`craftsUsed.${index}.craftName`)} />
+                    <TableCell className="p-3 align-top">
+                      <Input className="w-full h-9 text-sm focus-visible:ring-accent" placeholder="e.g., Tug 2" {...register(`craftsUsed.${index}.craftName`)} />
                     </TableCell>
-                    <TableCell className="p-3">
-                      <Input className="h-9 text-sm focus-visible:ring-accent" placeholder="From" {...register(`craftsUsed.${index}.fromLocation`)} />
+                    <TableCell className="p-3 align-top">
+                      <Input className="w-full h-9 text-sm focus-visible:ring-accent" placeholder="From" {...register(`craftsUsed.${index}.fromLocation`)} />
                     </TableCell>
-                    <TableCell className="p-3">
-                      <Input className="h-9 text-sm focus-visible:ring-accent" placeholder="To" {...register(`craftsUsed.${index}.toLocation`)} />
+                    <TableCell className="p-3 align-top">
+                      <Input className="w-full h-9 text-sm focus-visible:ring-accent" placeholder="To" {...register(`craftsUsed.${index}.toLocation`)} />
                     </TableCell>
                     <TableCell className="p-3 text-right">
                       <Button
@@ -150,6 +152,7 @@ export default function Step4SafetyAndCrafts() {
               )}
             </TableBody>
           </Table>
+        </div>
         </div>
       </div>
 

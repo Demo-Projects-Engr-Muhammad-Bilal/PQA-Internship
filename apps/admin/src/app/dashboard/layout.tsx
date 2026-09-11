@@ -110,8 +110,8 @@ function Header({ onMenuClick }: { onMenuClick?: () => void }) {
           </SheetTrigger>
           <SheetContent side="left" className="w-64 p-0">
             <div className="flex h-full flex-col">
-              <div className="border-b px-4 h-16 flex flex-col justify-center">
-                <Image src="/logo-actual.png" alt="PQA Logo" width={200} height={60} className="w-auto h-12 object-contain" />
+              <div className="border-b px-4 h-16 flex items-center justify-start">
+                  <Image src="/logo-actual.png" alt="PQA Logo" width={200} height={60} className="w-auto h-12 object-contain" />
               </div>
               <div className="flex-1 overflow-y-auto">
                 <SidebarNav />
@@ -247,7 +247,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         </div>
         <div className="flex-1 flex flex-col overflow-hidden">
           <Header />
-          <main className="flex-1 overflow-y-auto">{children}</main>
+          <main className="flex-1 overflow-y-auto p-4 md:px-6">{children}</main>
         </div>
       </div>
       </SidebarProvider>

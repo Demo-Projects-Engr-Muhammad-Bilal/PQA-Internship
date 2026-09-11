@@ -135,8 +135,8 @@ export default function AdminFormReviewPage({
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gray-50 p-6">
-        <div className="max-w-5xl mx-auto space-y-4">
+      <div className="min-h-screen bg-gray-50">
+        <div className="w-full space-y-4">
           <Skeleton className="h-12 w-full rounded-lg" />
           <Skeleton className="h-[900px] w-full rounded-lg" />
         </div>
@@ -146,8 +146,8 @@ export default function AdminFormReviewPage({
 
   if (error || !formData) {
     return (
-      <div className="min-h-screen bg-gray-50 p-6">
-        <div className="max-w-5xl mx-auto">
+      <div className="min-h-screen bg-gray-50">
+        <div className="w-full">
           <Alert variant="destructive">
             <AlertTriangle className="h-4 w-4" />
             <AlertDescription>{error || "Form not found"}</AlertDescription>
@@ -170,8 +170,8 @@ export default function AdminFormReviewPage({
     formData.pilot?.name || formData.pilot?.email || "Unknown Pilot";
 
   return (
-    <div className="min-h-screen bg-gray-50 p-6">
-      <div className="max-w-5xl mx-auto space-y-4">
+    <div className="min-h-screen bg-gray-50">
+      <div className="w-full space-y-4">
 
         {/* =====================================================
             ADMIN ACTION BAR â€” hidden on print via .no-print
@@ -190,7 +190,7 @@ export default function AdminFormReviewPage({
               size="sm"
               variant="outline"
               onClick={() => window.print()}
-              className="flex items-center gap-1"
+              className="hidden md:inline-flex items-center gap-1"
             >
               <Printer className="h-4 w-4" />
               Print Form
@@ -281,7 +281,7 @@ export default function AdminFormReviewPage({
         </div>
 
         <div className="no-print mb-8">
-          <AdminRemarksPanel formId={formId} />
+          <AdminRemarksPanel formId={formId} formStatus={formData.status} />
         </div>
 
         {/* =====================================================
@@ -289,8 +289,10 @@ export default function AdminFormReviewPage({
             The .print-only-form + .form-page classes are the
             two-layer print isolation defined in globals.css.
             ===================================================== */}
+        <div className="overflow-x-auto w-full pb-8">
         <div className="print-only-form form-page bg-white text-black">
           <FormContent form={formData} />
+        </div>
         </div>
       </div>
     </div>
